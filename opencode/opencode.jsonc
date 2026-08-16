@@ -1050,6 +1050,7 @@
       "/tmp/**": "allow",
       "~/.config/opencode/**": "allow",
       "~/.agents/skills/**": "allow",
+      "~/.cache/opencode/**": "allow",
       "~/.cache/oh-my-opencode/**": "allow",
       "~/.cache/oh-my-openagent/**": "allow",
       "~/.cache/opencode/**": "allow",

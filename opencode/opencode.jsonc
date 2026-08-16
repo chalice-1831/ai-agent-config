@@ -850,6 +850,7 @@
       "kubectl cordon *": "ask",
       "helm *": "ask",
       "helm lint *": "allow",
+      "helm show *": "allow",
       "helm version *": "allow",
       "helm template *": "allow",
       "helm dependency build *": "allow",

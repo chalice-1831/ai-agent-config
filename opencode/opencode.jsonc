@@ -1,188 +1,37 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "provider": {
-    "anthropic": {
-      "npm": "@ai-sdk/anthropic",
-      "name": "anthropic",
+    "opencode-go": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "opencode-go",
       "options": {
-        "baseURL": "{env:ANTHROPIC_BASE_URL}/v1",
-        "apiKey": "{env:ANTHROPIC_AUTH_TOKEN}",
+        "baseURL": "{env:AXONHUB_BASE_URL}",
+        "apiKey": "{env:AXONHUB_AUTH_TOKEN}",
         "disableMaxOutputTokens": true,
         "setCacheKey": true
       },
       "whitelist": [
-        "claude-sonnet-4-6",
-        "claude-opus-4-6",
-        "claude-opus-4-7",
-        "claude-haiku-4-5"
+        "minimax-m3",
+        "deepseek-v4-flash",
+        "qwen3.7-max",
+        "kimi-k2.7-code",
+        "mimo-v2.5"
       ],
       "models": {
-        "claude-opus-4-7": {
-          "name": "claude-opus-4-7",
-          "attachment": false,
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 16000
-            }
-          },
-          "variants": {
-            "low": {
-              "effort": "low"
-            },
-            "medium": {
-              "effort": "high"
-            },
-            "high": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 32000
-              }
-            },
-            "xhigh": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 128000
-              },
-              "speed": "fast"
-            }
-          }
+        "minimax-m3": {
+          "name": "minimax-m3"
         },
-        "claude-opus-4-6": {
-          "name": "claude-opus-4-6",
-          "attachment": false,
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 16000
-            }
-          },
-          "variants": {
-            "low": {
-              "effort": "low"
-            },
-            "medium": {
-              "effort": "high"
-            },
-            "high": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 32000
-              }
-            },
-            "xhigh": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 128000
-              },
-              "speed": "fast"
-            }
-          }
+        "deepseek-v4-flash": {
+          "name": "deepseek-v4-flash"
         },
-        "claude-sonnet-4-6": {
-          "name": "claude-sonnet-4-6",
-          "attachment": false,
-          "limit": {
-            "context": 200000,
-            "output": 64000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 16000
-            }
-          },
-          "variants": {
-            "low": {
-              "effort": "low"
-            },
-            "medium": {
-              "effort": "high"
-            },
-            "high": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 16000
-              }
-            },
-            "xhigh": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 64000
-              }
-            }
-          }
+        "qwen3.7-max": {
+          "name": "qwen3.7-max"
         },
-        "claude-haiku-4-5": {
-          "name": "claude-haiku-4-5",
-          "limit": {
-            "context": 200000,
-            "output": 64000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "variants": {
-            "low": {
-              "effort": "low"
-            },
-            "medium": {
-              "effort": "high"
-            },
-            "high": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 8000
-              }
-            },
-            "xhigh": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 16000
-              }
-            }
-          }
+        "kimi-k2.7-code": {
+          "name": "kimi-k2.7-code"
+        },
+        "mimo-v2.5": {
+          "name": "mimo-v2.5"
         }
       }
     },
@@ -191,8 +40,8 @@
       "npm": "@ai-sdk/openai",
       "api": "responses",
       "options": {
-        "baseURL": "{env:OPENAI_BASE_URL}",
-        "apiKey": "{env:OPENAI_AUTH_TOKEN}",
+        "baseURL": "{env:AXONHUB_BASE_URL}",
+        "apiKey": "{env:AXONHUB_AUTH_TOKEN}",
         "disableMaxOutputTokens": true,
         "truncation": "auto",
         "headerTimeout": 60000,
@@ -203,7 +52,8 @@
         "gpt-5.5",
         "gpt-5.6-sol",
         "gpt-5.6-terra",
-        "gpt-5.6-luna"
+        "gpt-5.6-luna",
+        "gpt-6-astra"
       ],
       "models": {
         "gpt-5.5": {
@@ -390,6 +240,59 @@
               "textVerbosity": "medium"
             }
           }
+        },
+        "gpt-6-astra": {
+            "limit": {
+                "context": 272000,
+                "output": 128000
+            },
+            "modalities": {
+                "input": [
+                    "text",
+                    "image"
+                ],
+                "output": [
+                    "text"
+                ]
+            },
+            "name": "gpt-6-astra",
+            "interleaved": {
+                "field": "reasoning_content"
+            },
+            "cost": {
+                "input": 10,
+                "output": 50,
+                "cache_read": 1
+            },
+            "reasoning": true,
+            "tool_call": true,
+            "variants": {
+                "low": {
+                    "reasoningEffort": "low",
+                    "reasoningSummary": "auto",
+                    "textVerbosity": "medium"
+                },
+                "medium": {
+                    "reasoningEffort": "medium",
+                    "reasoningSummary": "auto",
+                    "textVerbosity": "medium"
+                },
+                "high": {
+                    "reasoningEffort": "high",
+                    "reasoningSummary": "auto",
+                    "textVerbosity": "medium"
+                },
+                "xhigh": {
+                    "reasoningEffort": "xhigh",
+                    "reasoningSummary": "auto",
+                    "textVerbosity": "medium"
+                },
+                "max": {
+                    "reasoningEffort": "max",
+                    "reasoningSummary": "auto",
+                    "textVerbosity": "medium"
+                }
+            }
         }
       }
     }
@@ -403,9 +306,6 @@
       "type": "local",
       "enabled": true,
       "command": [
-        "uvx",
-        "--from",
-        "git+https://github.com/oraios/serena",
         "serena",
         "start-mcp-server",
         "--context",
@@ -460,17 +360,6 @@
       "type": "remote",
       "enabled": true,
       "url": "https://mcp.grep.app"
-    },
-    "mise": {
-      "type": "local",
-      "enabled": true,
-      "command": [
-        "mise",
-        "mcp"
-      ],
-      "environment": {
-        "MISE_EXPERIMENTAL": "1"
-      }
     }
   },
   "plugin": [
@@ -501,9 +390,9 @@
   "logLevel": "INFO",
   "enabled_providers": [
     "openai",
-    "anthropic"
+    "opencode-go"
   ],
-  "username": "xyuzou",
+  "username": "chalice-1831",
   "small_model": "openai/gpt-5.6-luna",
   "permission": {
     // Baseline: unknown capabilities ask by default. Specific safe tools are allowed below.

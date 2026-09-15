@@ -511,6 +511,7 @@
       "*": "ask",
       // Local read-only inspection and verification.
       "pwd": "allow",
+      "defuddle *": "allow",
       "sleep *": "ask",
       "ls *": "allow",
       "find *": "allow",

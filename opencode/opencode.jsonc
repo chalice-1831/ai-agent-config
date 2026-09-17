@@ -512,6 +512,8 @@
       // Local read-only inspection and verification.
       "pwd": "allow",
       "defuddle *": "allow",
+      "data *": "allow",
+      "printf *": "allow",
       "sleep *": "ask",
       "ls *": "allow",
       "find *": "allow",

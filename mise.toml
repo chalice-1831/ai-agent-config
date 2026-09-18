@@ -50,7 +50,7 @@ helm = "latest"
 "github:artifacthub/hub" = "latest"
 "npm:defuddle" = "latest"
 
-"github:anomalyco/opencode" = "1.18.22"
+"github:anomalyco/opencode" = "1.18.30"
 "go:github.com/grafana/gcx/cmd/gcx" = "latest"
 
 kubectl = "latest"

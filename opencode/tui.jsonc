@@ -1,0 +1,26 @@
+{
+    "$schema": "https://opencode.ai/tui.json",
+    "theme": "opencode",
+    "plugin": [
+        "oh-my-opencode-slim"
+    ],
+    "leader_timeout": 1200,
+    "scroll_acceleration": {
+        "enabled": true
+    },
+    "diff_style": "auto",
+    "cursor": {
+        "style": "block",
+        "blinking": true
+    },
+    "mouse": true,
+    "attention": {
+        "enabled": true,
+        "notifications": true,
+        "sound": false
+    },
+    "keybinds": {
+        "leader": "ctrl+x",
+        "command_list": "ctrl+p"
+    }
+}

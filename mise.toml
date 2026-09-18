@@ -54,4 +54,5 @@ helm = "latest"
 "go:github.com/grafana/gcx/cmd/gcx" = "latest"
 
 kubectl = "latest"
+codex = "0.155.0"
 

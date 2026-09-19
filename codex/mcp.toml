@@ -1,0 +1,42 @@
+# Shared MCP server definitions.
+
+[mcp_servers.serena]
+enabled = true
+command = "uvx"
+args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--context", "ide", "--open-web-dashboard", "false", "--project-from-cwd"]
+
+[mcp_servers.sequential-thinking]
+enabled = true
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+
+[mcp_servers.exa]
+enabled = true
+command = "npx"
+args = ["-y", "exa-mcp-server"]
+
+[mcp_servers.context7]
+enabled = true
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+
+[mcp_servers.memory]
+enabled = true
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-memory"]
+
+[mcp_servers.deepwiki]
+enabled = true
+url = "https://mcp.deepwiki.com/mcp"
+
+[mcp_servers.gh_grep]
+enabled = true
+url = "https://mcp.grep.app"
+
+[mcp_servers.mise]
+enabled = true
+command = "mise"
+args = ["mcp"]
+
+[mcp_servers.mise.env]
+MISE_EXPERIMENTAL = "1"

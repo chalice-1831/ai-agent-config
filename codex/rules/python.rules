@@ -1,0 +1,3 @@
+# python command policy.
+prefix_rule(pattern = ["pip", "list"], decision = "allow", match = ["pip list --help"])
+prefix_rule(pattern = ["python"], decision = "allow", match = ["python --help"])

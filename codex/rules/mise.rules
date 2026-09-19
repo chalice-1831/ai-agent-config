@@ -1,0 +1,2 @@
+# mise command policy.
+prefix_rule(pattern = ["mise", "ls"], decision = "allow", match = ["mise ls --help"])

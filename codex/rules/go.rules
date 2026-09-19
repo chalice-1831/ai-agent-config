@@ -1,0 +1,4 @@
+# go command policy.
+prefix_rule(pattern = ["go"], decision = "allow", match = ["go --help"])
+prefix_rule(pattern = ["gofmt"], decision = "allow", match = ["gofmt --help"])
+prefix_rule(pattern = ["golangci-lint"], decision = "allow", match = ["golangci-lint --help"])

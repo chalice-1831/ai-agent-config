@@ -1,0 +1,2 @@
+# Project-scoped GitHub command policy.
+prefix_rule(pattern = ["gh", "pr", "create", "--repo", "zouxingyuks/ansible"], decision = "allow", match = ["gh pr create --repo zouxingyuks/ansible --title example"], not_match = ["gh pr create --repo other/repo"])

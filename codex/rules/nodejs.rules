@@ -1,0 +1,3 @@
+# nodejs command policy.
+prefix_rule(pattern = ["pnpm", "run"], decision = "allow", match = ["pnpm run --help"])
+prefix_rule(pattern = ["npm", "list"], decision = "allow", match = ["npm list --help"])

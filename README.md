@@ -13,6 +13,8 @@
 ├── mise.toml                    # 基础工具链：Go、LSP、Biome、ripgrep、jq、yq、gh、ast-grep 等
 ├── mise.sh                      # 将 mise.toml 链接到 mise 全局配置的脚本
 ├── opencode.sh                  # 将配置链接到 OpenCode 配置目录的脚本
+├── codex.sh                     # 安装 Codex 规则并同步共享 MCP
+├── codex/                       # 共享 MCP、命令规则及安装说明
 ├── opencode/
 │   ├── opencode.jsonc           # OpenCode 主配置：providers、MCP、plugins、permissions、formatters
 │   ├── oh-my-openagent.jsonc    # OhMyOpenAgent agents / categories / fallback 配置
@@ -48,6 +50,9 @@ mise install
 ```bash
 ./opencode.sh diff
 ```
+
+|Codex:先运行 `./codex.sh link`，再运行 `./codex.sh sync`；用 `./codex.sh diff` 检查状态
+|Codex文档:[多机器配置说明](codex/README.md)
 
 安装常用 skills：
 

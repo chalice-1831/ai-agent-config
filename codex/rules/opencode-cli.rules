@@ -1,0 +1,3 @@
+# opencode-cli command policy.
+prefix_rule(pattern = ["opencode", "--version"], decision = "allow", match = ["opencode --version", "opencode --version --help"])
+prefix_rule(pattern = ["opencode", "models"], decision = "allow", match = ["opencode models", "opencode models --help"])

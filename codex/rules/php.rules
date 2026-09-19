@@ -1,0 +1,2 @@
+# php command policy.
+prefix_rule(pattern = ["php"], decision = "allow", match = ["php --help"])

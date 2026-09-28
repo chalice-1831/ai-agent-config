@@ -29,9 +29,6 @@ npx skills add --agent opencode -g https://github.com/samber/cc-skills-golang -y
 ## Python
 npx skills add --agent opencode -g https://github.com/wshobson/agents --skill python-design-patterns -y
 
-# Github
-npx skills add --agent opencode -g https://github.com/xixu-me/skills --skill github-actions-docs -y
-
 ## Cli Docs
 npx skills add --agent opencode -g https://github.com/cli/cli/tree/trunk --skill gh -y
 npx skills add --agent opencode -g https://github.com/microsoft/playwright-cli --skill playwright-cli -y

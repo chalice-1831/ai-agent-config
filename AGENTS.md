@@ -18,11 +18,13 @@
 |Think Before Coding:state assumptions before implementation|if multiple interpretations present options|ask only when materially unclear|surface tradeoffs and simpler alternatives
 |Think Before Coding:unknown discovery=for high-cost decisions, run blind-spot pass before planning: identify unconfirmed facts, high-cost assumptions, and user questions that could change public contract, data model, security/trust boundary, cross-component or long-lived architecture, irreversible operation, or ambiguous/high-impact user-visible behavior|do not trigger for ordinary unfamiliar code or multi-file work already covered by retrieval-led/local-pattern discovery
 |Think Before Coding:implementation deviations=when implementation reality invalidates plan assumptions, record reason + conservative decision + verification path before continuing; stop and ask when the deviation changes public contract, data model, security/trust boundary, irreversible operation, cross-component or long-lived architecture, or ambiguous/high-impact user-visible behavior|do not log ordinary implementation details
+|First Principles & Ablation:trigger on high-cost design, architecture/public-contract/data-model/security changes, performance/correctness/reliability claims, or explicit deep-research requests|first reduce the problem to invariants, constraints, and success criteria after retrieval/local-pattern discovery|run mental ablation before adding abstractions/dependencies/config/process: if removing the proposed element still satisfies the task, keep the simpler baseline|real measurements are required before relying on performance claims; otherwise record the baseline-preserving choice and verification path
 |Simplicity First:minimum code that solves request|no speculative features/abstractions/configurability|rewrite if overcomplicated
 |Surgical Changes:touch only required lines|match existing style|no unrelated cleanup/refactor|remove only orphans created by own changes|do not chase formatter-only or auto-formatting diffs once required checks pass; fix accidental corruption, syntax breakage, semantic changes, or behavior changes, but accept harmless whitespace/blank-line/table-alignment drift caused by formatting tools
 |Goal-Driven Execution:define verifiable success criteria|for multi-step tasks use brief plan with checks|loop until verified through requested surface
 
 <!-- agentmemory:start -->
+
 ## Agent memory (agentmemory)
 
 You have persistent long-term memory via the agentmemory MCP server. Tools: `memory_recall`, `memory_smart_search`, `memory_save`, `memory_sessions`.
@@ -30,4 +32,5 @@ You have persistent long-term memory via the agentmemory MCP server. Tools: `mem
 - At the START of a task, call `memory_recall` (or `memory_smart_search`) with the task context to load relevant past decisions, fixes, and preferences before asking the user to repeat anything.
 - When you learn something durable (a decision, a fix, a gotcha, a user preference, a project convention), call `memory_save` to persist it.
 - Prefer recalling over re-deriving, and save concise reusable facts rather than transcripts.
+
 <!-- agentmemory:end -->

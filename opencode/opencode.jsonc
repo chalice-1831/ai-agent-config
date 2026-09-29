@@ -471,13 +471,24 @@
       "environment": {
         "MISE_EXPERIMENTAL": "1"
       }
+    },
+    "agentmemory": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@agentmemory/mcp"
+      ],
+      "enabled": true,
+      "environment": {
+        "AGENTMEMORY_URL": "{env:AGENTMEMORY_URL}",
+        "AGENTMEMORY_SECRET": "{env:AGENTMEMORY_SECRET}"
+      }
     }
   },
   "plugin": [
     "opencode-axonhub-tracing@1.1.0",
-    //    "@snubisks/opencode-dcp@3.1.14",
-    //    "@tarquinen/opencode-dcp@3.1.15",
-//    "oh-my-openagent@v4.19.2",
+    "./plugins/agentmemory-capture.ts",
     "opencode-acp@stable"
   ],
   "share": "disabled",

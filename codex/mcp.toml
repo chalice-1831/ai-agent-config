@@ -1,9 +1,14 @@
 # Shared MCP server definitions.
 
 [mcp_servers.serena]
-enabled = true
+enabled = false
 command = "uvx"
 args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--context", "ide", "--open-web-dashboard", "false", "--project-from-cwd"]
+
+[mcp_servers.codegraph]
+enabled = true
+command = "codegraph"
+args = ["serve", "--mcp"]
 
 [mcp_servers.sequential-thinking]
 enabled = true

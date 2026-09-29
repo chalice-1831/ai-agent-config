@@ -9,10 +9,11 @@
 |Consistency Check:identify baseline before edits; check departures before delivery|briefly report references and departure status for routine work; expand only conflicts/proposals/approval requests|safely bring only your own unauthorized departures back within the approved approach, otherwise pause and ask; after-the-fact disclosure is not approval|do not standardize unrelated legacy code or expand migration scope
 
 |Must use: sequential-thinking in all time.
-|Core Tools: always use this tools|serena (semantic code ops)|context7 (3rd-party docs)|sequential-thinking (decisions)
+|Core Tools: always use this tools|codegraph (semantic code graph)|context7 (3rd-party docs)|sequential-thinking (decisions)
 |Language Policy:Chinese for main|English for proper nouns and notes
 |Compression Rule:Follow ~/.config/opencode/AGENTS-compression-guide.md (pipe-index format, concise, no prose/code blocks)
 |Memory Policy:session-start→search_nodes for relevant user/project context before acting|Store: key decisions, user preferences, learned patterns, architecture insights|Entity types: preference, decision, pattern, concept, project, convention|Link entities via create_relations (active voice)|Update via add_observations when facts evolve, don't duplicate|Read-before-write: search_nodes before create to avoid duplicates
+|Tool Routing:codegraph=current code structure, symbols, call edges, routes, impact; agentmemory=session history, decisions, preferences, post-mortems; for historical bugfixes recall memory first, then inspect current code with codegraph
 |MCP Policy:retry on failure|analyze error and adjust params|never skip or abandon
 |Format-Control Loops:on formatter/parser/schema failure, preserve the original task contract and inspect exact error/current state before retrying|retry only with changed input or hypothesis|if same failure recurs without new evidence, stop and report blocker; never bypass validation or drift scope
 |Think Before Coding:state assumptions before implementation|if multiple interpretations present options|ask only when materially unclear|surface tradeoffs and simpler alternatives

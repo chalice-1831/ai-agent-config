@@ -401,7 +401,7 @@
   "mcp": {
     "serena": {
       "type": "local",
-      "enabled": true,
+      "enabled": false,
       "command": [
         "uvx",
         "--from",
@@ -413,6 +413,15 @@
         "--open-web-dashboard",
         "false",
         "--project-from-cwd"
+      ]
+    },
+    "codegraph": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "codegraph",
+        "serve",
+        "--mcp"
       ]
     },
     "sequential-thinking": {

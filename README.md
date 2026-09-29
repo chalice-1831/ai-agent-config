@@ -20,6 +20,8 @@
 │   ├── oh-my-openagent.jsonc    # OhMyOpenAgent agents / categories / fallback 配置
 │   ├── dcp.jsonc                # Dynamic Context Pruning 配置
 │   └── tui.json                 # TUI 插件配置
+├── support-files/
+│   └── agentmemory/docker-compose/ # agentmemory Docker Compose 运行模板
 └── scripts/
     └── skills.sh                # 全局安装常用 OpenCode skills
 ```
@@ -131,6 +133,10 @@ backup  占位命令，尚未实现
 `opencode/dcp.jsonc` 维护 Dynamic Context Pruning 策略，用于控制上下文裁剪、压缩提醒、保护工具输出和错误清理。
 
 `opencode/tui.json` 只加载 `oh-my-openagent/tui` 插件。
+
+## Support Files
+
+`support-files/agentmemory/docker-compose/` 维护 agentmemory Docker Compose 运行模板，可供 OpenCode、Codex 或其他 agent 共用同一个 memory server。真实 `.env` 不进入仓库，按子目录 README 从 `.env.example` 复制后填写本机配置。
 
 ## 常用维护流程
 

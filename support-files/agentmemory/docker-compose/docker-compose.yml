@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     ports:
       - "0.0.0.0:3111:3111"
-      - "127.0.0.1:3113:3114"
+      - "127.0.0.1:3113:3113"
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_AUTH_TOKEN:-}
       GEMINI_API_KEY: ${GEMINI_AUTH_TOKEN:-}
@@ -26,6 +26,8 @@ services:
       AGENTMEMORY_AUTO_COMPRESS: ${AGENTMEMORY_AUTO_COMPRESS:-false}
       GRAPH_EXTRACTION_ENABLED: ${AGENTMEMORY_GRAPH_EXTRACTION_ENABLED:-false}
       AGENTMEMORY_INJECT_CONTEXT: ${AGENTMEMORY_INJECT_CONTEXT:-false}
+      AGENTMEMORY_VIEWER_HOST: 0.0.0.0
+      VIEWER_ALLOWED_HOSTS: ${VIEWER_ALLOWED_HOSTS:-localhost:3113,127.0.0.1:3113}
     volumes:
       - agentmemory-data:/data
     healthcheck:

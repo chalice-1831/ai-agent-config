@@ -85,6 +85,4 @@ fi
 
 export AGENTMEMORY_SECRET="$(cat "$HMAC_FILE")"
 
-socat TCP-LISTEN:3114,fork,reuseaddr,bind=0.0.0.0 TCP:127.0.0.1:3113 &
-
 exec gosu "$RUN_AS" agentmemory "$@"

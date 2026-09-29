@@ -6,13 +6,17 @@ This directory contains the maintained Docker Compose runtime for `agentmemory` 
 
 - `docker-compose.yml`: builds and runs `agentmemory`.
 - `Dockerfile`: pins `@agentmemory/agentmemory` and the iii runtime to compatible versions.
-- `entrypoint.sh`: prepares persistent storage, generates the HMAC secret, and exposes the dashboard through a container-local proxy.
+- `entrypoint.sh`: prepares persistent storage, generates the HMAC secret, and starts `agentmemory`.
 - `.env.example`: environment template. Copy it to `.env` and fill local values. Do not commit `.env`.
 
 ## Ports
 
-- `3111`: REST/MCP API, bound to `0.0.0.0` for other machines or agents.
-- `3113`: dashboard, bound to `127.0.0.1` on the host.
+- `3111`: REST/MCP API, mapped to container port `3111` and bound to `0.0.0.0` on the host for other machines or agents.
+- `3113`: agentmemory viewer, mapped to container port `3113` and bound to `127.0.0.1` on the host.
+
+The compose file fixes the internal viewer bind host to `0.0.0.0` so Docker can publish the viewer port. Do not treat `AGENTMEMORY_VIEWER_HOST` as an operator setting. Control external access with the `ports` mappings and `VIEWER_ALLOWED_HOSTS` instead.
+
+If you expose the viewer through another host name, IP, or reverse proxy, add the exact incoming Host header to `VIEWER_ALLOWED_HOSTS` in `.env`.
 
 ## Quick Start
 

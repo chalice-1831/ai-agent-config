@@ -51,3 +51,5 @@ gh skill install --scope user --agent opencode https://github.com/redis/agent-sk
 npx skills add --agent opencode -g https://github.com/kepano/obsidian-skills.git -y
 
 npx skills add --agent opencode -g https://github.com/grafana/gcx.git -y
+
+npx skills add --agent opencode -g rohitg00/agentmemory -y

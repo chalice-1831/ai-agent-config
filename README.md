@@ -130,6 +130,8 @@ backup  占位命令，尚未实现
 - permissions：对常用只读命令放行，对破坏性 Git、Docker、Kubernetes、文件删除、密钥文件读写等操作设置 ask / deny。
 - formatters：为 Go、Shell、Markdown / YAML 配置格式化命令。
 
+|OpenCode 权限审计:仅记录弹窗申请与回复|用户级按小时 JSONL:~/.local/state/opencode/permission-audit/（可由 XDG_STATE_HOME 覆盖）|含原始 pattern 与项目路径，文件权限 0600|不自动清理，需手动删除旧文件|不自动修改权限|写入失败记录错误并在 TUI 可用时提示
+
 `opencode/oh-my-openagent.jsonc` 维护 OhMyOpenAgent 的 agents 和 categories，例如编排、深度执行、咨询、检索、规划、评审、视觉工程、写作等角色，并配置模型与 fallback。
 
 `opencode/dcp.jsonc` 维护 Dynamic Context Pruning 策略，用于控制上下文裁剪、压缩提醒、保护工具输出和错误清理。

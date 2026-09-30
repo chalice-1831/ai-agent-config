@@ -451,15 +451,6 @@
         "@upstash/context7-mcp"
       ]
     },
-    "memory": {
-      "type": "local",
-      "enabled": true,
-      "command": [
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-memory"
-      ]
-    },
     "deepwiki": {
       "type": "remote",
       "enabled": true,

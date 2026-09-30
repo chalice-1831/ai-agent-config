@@ -123,7 +123,7 @@ backup  占位命令，尚未实现
 
 - providers：配置 Anthropic 与 OpenAI 兼容 provider，并通过环境变量读取 base URL 和 token。
 - models：维护主力模型、轻量模型、上下文窗口、输出限制和 reasoning / thinking variants。
-- MCP：启用 `codegraph`、`sequential-thinking`、`exa`、`context7`、`memory`、`deepwiki`、`gh_grep`、`mise`、`agentmemory` 等工具；`serena` 配置暂时保留但禁用，便于回滚。
+- MCP：启用 `codegraph`、`sequential-thinking`、`exa`、`context7`、`deepwiki`、`gh_grep`、`mise`、`agentmemory` 等工具；`serena` 配置暂时保留但禁用，便于回滚。
 - CodeGraph 负责当前代码结构、符号、调用边、路由和影响面查询；AgentMemory 负责历史会话、决策、偏好和 post-mortem 检索。处理历史 bug 时先查 AgentMemory，再用 CodeGraph 检查当前代码。
 - CodeGraph CLI 由 `mise.toml` 安装；每个需要索引的项目仍需执行一次 `codegraph init` 建立本地 `.codegraph/` 索引。
 - plugins：启用 tracing、Markdown table formatter、DCP、OhMyOpenAgent。

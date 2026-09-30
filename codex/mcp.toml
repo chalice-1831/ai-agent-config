@@ -25,10 +25,10 @@ enabled = true
 command = "npx"
 args = ["-y", "@upstash/context7-mcp"]
 
-[mcp_servers.memory]
-enabled = true
+[mcp_servers.agentmemory]
 command = "npx"
-args = ["-y", "@modelcontextprotocol/server-memory"]
+args = ["-y", "@agentmemory/mcp"]
+env_vars = ["AGENTMEMORY_URL", "AGENTMEMORY_SECRET"]
 
 [mcp_servers.deepwiki]
 enabled = true

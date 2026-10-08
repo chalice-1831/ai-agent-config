@@ -25,3 +25,4 @@ prefix_rule(pattern = ["which"], decision = "allow", match = ["which", "which --
 prefix_rule(pattern = ["true"], decision = "allow", match = ["true", "true --help"])
 prefix_rule(pattern = ["base64", "-d"], decision = "allow", match = ["base64 -d", "base64 -d --help"])
 prefix_rule(pattern = ["nl", "-ba"], decision = "allow", match = ["nl -ba", "nl -ba --help"])
+prefix_rule(pattern = ["bash", "-n"], decision = "allow", match = ["bash -n script.sh"], not_match = ["bash -c 'echo example'"])

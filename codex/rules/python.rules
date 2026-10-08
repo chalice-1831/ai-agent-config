@@ -1,3 +1,4 @@
 # python command policy.
 prefix_rule(pattern = ["pip", "list"], decision = "allow", match = ["pip list --help"])
 prefix_rule(pattern = ["python"], decision = "allow", match = ["python --help"])
+prefix_rule(pattern = ["python3", "--version"], decision = "allow", match = ["python3 --version"], not_match = ["python3 -c 'print(1)'"])

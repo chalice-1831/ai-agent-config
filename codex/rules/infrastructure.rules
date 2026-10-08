@@ -12,3 +12,7 @@ prefix_rule(pattern = ["helm", "version"], decision = "allow", match = ["helm ve
 prefix_rule(pattern = ["helm", "template"], decision = "allow", match = ["helm template --help"])
 prefix_rule(pattern = ["helm", "dependency", "build"], decision = "allow", match = ["helm dependency build --help"])
 prefix_rule(pattern = ["ansible-playbook", "--syntax-check"], decision = "allow", match = ["ansible-playbook --syntax-check --help"])
+prefix_rule(pattern = ["docker", "inspect", "--format"], decision = "allow", match = ["docker inspect --format '{{.State.Status}}' example-container"], not_match = ["docker inspect example-container"])
+prefix_rule(pattern = ["docker", "info", "--format"], decision = "allow", match = ["docker info --format '{{.ServerVersion}}'"], not_match = ["docker info"])
+prefix_rule(pattern = ["docker", "image", "inspect"], decision = "allow", match = ["docker image inspect example/image"], not_match = ["docker image rm example/image"])
+prefix_rule(pattern = ["docker", "compose", "version"], decision = "allow", match = ["docker compose version"], not_match = ["docker compose up"])

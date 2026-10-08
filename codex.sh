@@ -141,6 +141,16 @@ Commands:
 Environment variables:
   TARGET_DIR   Overrides CODEX_HOME (default: ~/.codex)
 
+Shared instructions:
+  link installs AGENTS.md and AGENTS-compression-guide.md from this repository
+  into TARGET_DIR as symlinks. OpenCode's opencode.sh links the same source files.
+  Edit the repository files once to share instructions between both clients.
+
+On another machine:
+  Clone or pull this repository, then run ./codex.sh link.
+  To share with OpenCode too, run ./opencode.sh link from the repository root.
+  Pull subsequent instruction changes on each machine; symlinks follow local files.
+
 MCP sync/diff requires uv; the isolated TOMLKit dependency is pinned in the helper.
 Project rules under .codex/rules/ are never installed globally.
 EOF

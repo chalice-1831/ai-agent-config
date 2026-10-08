@@ -68,3 +68,4 @@ prefix_rule(pattern = ["gh", "gpg-key", "list"], decision = "allow", match = ["g
 prefix_rule(pattern = ["gh", "pr", "create"], decision = "allow", match = ["gh pr create --help"], not_match = ["gh pr merge 123", "gh pr close 123", "gh api repos/owner/repo/pulls/123"])
 prefix_rule(pattern = ["gh", "pr", "edit"], decision = "allow", match = ["gh pr edit --help"], not_match = ["gh pr merge 123", "gh pr close 123", "gh api repos/owner/repo/pulls/123"])
 prefix_rule(pattern = ["gh", "pr", "ready"], decision = "allow", match = ["gh pr ready --help"], not_match = ["gh pr merge 123", "gh pr close 123", "gh api repos/owner/repo/pulls/123"])
+prefix_rule(pattern = ["gh", "auth", "status"], decision = "allow", match = ["gh auth status"], not_match = ["gh auth setup-git"])

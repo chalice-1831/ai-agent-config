@@ -108,6 +108,23 @@ function resolveProjectName(dir: string): string {
 const stashedFiles = new Map<string, Set<string>>();
 const seenSubtaskIds = new Map<string, Set<string>>();
 const seenToolCallIds = new Map<string, Set<string>>();
+type PermissionRequest = {
+  permission: string;
+  patterns: string[];
+  title: string;
+  toolCallId: string | null;
+};
+const permissionRequests = new Map<string, Map<string, PermissionRequest>>();
+type MessageContext = {
+  role: string | null;
+  parentID: unknown;
+  modelID: unknown;
+  providerID: unknown;
+  mode: unknown;
+  finish: unknown;
+  error: string | null;
+};
+const messageContexts = new Map<string, Map<string, MessageContext>>();
 const contextInjectedSessions = new Set<string>();
 // cache the context returned by POST /session/start so the chat
 // system-transform hook can inject it without a second /context fetch.
@@ -134,10 +151,24 @@ function toolCallSetFor(sid: string): Set<string> {
   return s;
 }
 
+function permissionRequestMapFor(sid: string): Map<string, PermissionRequest> {
+  let s = permissionRequests.get(sid);
+  if (!s) { s = new Map<string, PermissionRequest>(); permissionRequests.set(sid, s); }
+  return s;
+}
+
+function messageContextMapFor(sid: string): Map<string, MessageContext> {
+  let s = messageContexts.get(sid);
+  if (!s) { s = new Map<string, MessageContext>(); messageContexts.set(sid, s); }
+  return s;
+}
+
 function pruneSessionMaps(sid: string): void {
   stashedFiles.delete(sid);
   seenSubtaskIds.delete(sid);
   seenToolCallIds.delete(sid);
+  permissionRequests.delete(sid);
+  messageContexts.delete(sid);
   sessionProjects.delete(sid);
 }
 
@@ -145,6 +176,20 @@ function safeSlice(v: unknown, max: number): string {
   if (typeof v === "string") return v.slice(0, max);
   if (v == null) return "";
   try { return JSON.stringify(v).slice(0, max); } catch { return ""; }
+}
+
+function hasEmptyMemorySearchResult(toolName: string, output: unknown): boolean {
+  const searchTools = ["recall", "search", "patterns", "sessions", "history"];
+  if (!toolName.startsWith("agentmemory_memory_") || !searchTools.some((name) => toolName.includes(name))) {
+    return false;
+  }
+  let value = output;
+  if (typeof value === "string") {
+    try { value = JSON.parse(value); } catch { return false; }
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const result = value as Record<string, unknown>;
+  return Array.isArray(result.results) && result.results.length === 0;
 }
 
 const AGENTMEMORY_INSTRUCTIONS = `<agentmemory-instructions>
@@ -280,10 +325,12 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         if (status.type === "idle") {
           await post("/summarize", { sessionId: sid });
         }
+        const message = safeSlice(status.message, 2000).trim();
+        if (!message) return;
         await observe(sid, "session_status", {
           status_type: status.type,
           attempt: status.attempt ?? null,
-          message: safeSlice(status.message, 2000),
+          message,
         });
       }
 
@@ -292,7 +339,6 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         const sid = props.sessionID || activeSessionId;
         if (sid) {
           await post("/summarize", { sessionId: sid });
-          await observe(sid, "session_compacted", {});
         }
       }
 
@@ -301,12 +347,17 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         const info = props.info as Record<string, unknown> | undefined;
         const sid = (info?.id as string) || props.sessionID || activeSessionId;
         if (!sid) return;
+        const summary = (info?.summary as Record<string, unknown> | undefined) || {};
+        const additions = typeof summary.additions === "number" ? summary.additions : 0;
+        const deletions = typeof summary.deletions === "number" ? summary.deletions : 0;
+        const title = typeof info?.title === "string" && info.title.length > 0 ? info.title : null;
+        if (!title && additions === 0 && deletions === 0) return;
         await observe(sid, "session_updated", {
-          title: info?.title ?? null,
+          title,
           parentID: info?.parentID ?? null,
-          additions: (info?.summary as any)?.additions ?? null,
-          deletions: (info?.summary as any)?.deletions ?? null,
-          files: (info?.summary as any)?.files ?? null,
+          additions,
+          deletions,
+          files: Array.isArray(summary.files) && (additions > 0 || deletions > 0) ? summary.files : null,
         });
       }
 
@@ -315,10 +366,13 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         const sid = props.sessionID || activeSessionId;
         if (!sid || !Array.isArray(props.diff)) return;
         const diffs = props.diff as Array<Record<string, unknown>>;
+        const additions = diffs.reduce((s, d) => s + ((d.additions as number) || 0), 0);
+        const deletions = diffs.reduce((s, d) => s + ((d.deletions as number) || 0), 0);
+        if (diffs.length === 0 || (additions === 0 && deletions === 0)) return;
         await observe(sid, "session_diff", {
           files: diffs.map(d => d.file),
-          additions: diffs.reduce((s, d) => s + ((d.additions as number) || 0), 0),
-          deletions: diffs.reduce((s, d) => s + ((d.deletions as number) || 0), 0),
+          additions,
+          deletions,
           diffs: diffs.slice(0, 50),
         });
       }
@@ -355,12 +409,24 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "message.updated") {
         const info = props.info as Record<string, unknown> | undefined;
         if (!info) return;
+        const sid = props.sessionID || (info.sessionID as string) || activeSessionId;
+        if (!sid) return;
+        if (typeof info.id === "string" && info.id.length > 0) {
+          messageContextMapFor(sid).set(info.id, {
+            role: typeof info.role === "string" ? info.role : null,
+            parentID: info.parentID ?? null,
+            modelID: info.modelID ?? null,
+            providerID: info.providerID ?? null,
+            mode: info.mode ?? null,
+            finish: info.finish ?? null,
+            error: info.error ? extractErrorMessage(info.error) : null,
+          });
+        }
 
         if (info.role === "assistant") {
-          const sid = props.sessionID || (info.sessionID as string) || activeSessionId;
-          if (!sid) return;
           const tokens = info.tokens as Record<string, unknown> | undefined;
           const error = info.error ? extractErrorMessage(info.error) : null;
+          if (!error) return;
           await observe(sid, "assistant_message", {
             messageID: info.id,
             parentID: info.parentID,
@@ -387,11 +453,25 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       // ── message.removed ──
       if (type === "message.removed") {
         const sid = props.sessionID || activeSessionId;
-        if (sid) {
-          await observe(sid, "message_removed", {
-            messageID: props.messageID,
-          });
-        }
+        if (!sid) return;
+        const messageID = typeof props.messageID === "string"
+          ? props.messageID
+          : typeof props.id === "string"
+            ? props.id
+            : "";
+        const messageContext = messageID ? messageContexts.get(sid)?.get(messageID) : undefined;
+        if (!messageContext) return;
+        messageContexts.get(sid)?.delete(messageID);
+        await observe(sid, "message_removed", {
+          messageID,
+          role: messageContext.role,
+          parentID: messageContext.parentID,
+          modelID: messageContext.modelID,
+          providerID: messageContext.providerID,
+          mode: messageContext.mode,
+          finish: messageContext.finish,
+          error: messageContext.error,
+        });
       }
 
       // ── message.part.updated ──
@@ -428,6 +508,7 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
             if (callSet.has(callId)) return;
             callSet.add(callId);
             const st = state as Record<string, unknown>;
+            if (hasEmptyMemorySearchResult(toolName, st.output)) return;
             const rawTime = (st.time as any) || {};
             const startTime = typeof rawTime.start === "number" ? rawTime.start : null;
             const endTime = typeof rawTime.end === "number" ? rawTime.end : null;
@@ -463,21 +544,15 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         }
 
         if (part.type === "step-finish") {
-          await observe(sid, "step_finish", {
-            messageID: part.messageID,
-            reason: part.reason ?? null,
-            cost: (part as any).cost ?? 0,
-            input_tokens: ((part as any).tokens?.input as number) ?? 0,
-            output_tokens: ((part as any).tokens?.output as number) ?? 0,
-            reasoning_tokens: ((part as any).tokens?.reasoning as number) ?? 0,
-          });
           return;
         }
 
         if (part.type === "reasoning") {
+          const text = safeSlice((part as any).text, 4000).trim();
+          if (!text) return;
           await observe(sid, "reasoning", {
             messageID: part.messageID,
-            text: safeSlice((part as any).text, 4000),
+            text,
           });
           return;
         }
@@ -498,26 +573,20 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         }
 
         if (part.type === "compaction") {
-          await observe(sid, "compaction_event", {
-            messageID: part.messageID,
-            auto: (part as any).auto ?? false,
-          });
           return;
         }
 
         if (part.type === "agent") {
-          await observe(sid, "agent_selected", {
-            messageID: part.messageID,
-            name: (part as any).name,
-          });
           return;
         }
 
         if (part.type === "retry") {
+          const error = safeSlice((part as any).error, 2000).trim();
+          if (!error) return;
           await observe(sid, "retry_attempt", {
             messageID: part.messageID,
             attempt: (part as any).attempt,
-            error: safeSlice((part as any).error, 2000),
+            error,
           });
           return;
         }
@@ -537,6 +606,45 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         }
       }
 
+      // ── permission.asked ──
+      if (type === "permission.asked") {
+        const sid = props.sessionID || activeSessionId;
+        if (!sid) return;
+        const permissionID = typeof props.id === "string"
+          ? props.id
+          : typeof props.permissionID === "string"
+            ? props.permissionID
+            : "";
+        const permission = typeof props.permission === "string"
+          ? props.permission
+          : typeof props.type === "string"
+            ? props.type
+            : "unknown";
+        const patterns = Array.isArray(props.patterns)
+          ? props.patterns.filter((p): p is string => typeof p === "string")
+          : Array.isArray(props.pattern)
+            ? props.pattern.filter((p): p is string => typeof p === "string")
+            : typeof props.pattern === "string"
+              ? [props.pattern]
+              : [];
+        const toolCallId = typeof props.callID === "string" ? props.callID : null;
+        const title = typeof props.title === "string" && props.title.length > 0
+          ? props.title
+          : permission;
+
+        if (permissionID) {
+          permissionRequestMapFor(sid).set(permissionID, { permission, patterns, title, toolCallId });
+        }
+        await observe(sid, "notification", {
+          notification_type: "permission_prompt",
+          permission,
+          pattern: patterns.join(", "),
+          patterns,
+          tool_call_id: toolCallId,
+          title,
+        });
+      }
+
       // ── permission.updated ──
       if (type === "permission.updated") {
         const sid = props.sessionID || activeSessionId;
@@ -549,7 +657,6 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
             : (props.pattern || ""),
           tool_call_id: props.callID || null,
           title: props.title || props.type || "",
-          metadata: props.metadata || {},
         });
       }
 
@@ -557,9 +664,22 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "permission.replied") {
         const sid = props.sessionID || activeSessionId;
         if (!sid) return;
+        const permissionID = typeof props.permissionID === "string"
+          ? props.permissionID
+          : typeof props.requestID === "string"
+            ? props.requestID
+            : "";
+        const request = permissionID ? permissionRequests.get(sid)?.get(permissionID) : undefined;
+        if (!request) return;
+        permissionRequests.get(sid)?.delete(permissionID);
         await observe(sid, "permission_replied", {
-          permission_id: props.permissionID || props.requestID || "",
+          permission_id: permissionID,
           response: props.response || props.reply || "",
+          permission: request.permission,
+          pattern: request.patterns.join(", "),
+          patterns: request.patterns,
+          tool_call_id: request.toolCallId,
+          title: request.title,
         });
       }
 
@@ -626,17 +746,6 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (!input.model || !output) return;
       const sid = input.sessionID || activeSessionId;
       if (!sid) return;
-      await observe(sid, "llm_params", {
-        agent: input.agent,
-        model: `${input.model.providerID}/${input.model.id}`,
-        provider_url: input.model.api?.url ?? null,
-        temperature: output.temperature,
-        topP: output.topP,
-        max_output_tokens: input.model.limit?.output ?? null,
-        context_limit: input.model.limit?.context ?? null,
-        cost_1k_input: input.model.cost?.input ?? 0,
-        cost_1k_output: input.model.cost?.output ?? 0,
-      });
     },
 
     // ── tool.execute.before ──

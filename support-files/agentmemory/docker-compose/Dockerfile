@@ -4,22 +4,23 @@ FROM iiidev/iii:${III_VERSION} AS iii-image
 
 FROM node:22-slim
 
-ARG AGENTMEMORY_VERSION=0.9.30
-ARG III_VERSION=0.22.1
-ARG III_SDK_VERSION=0.22.1
-
 RUN apt-get update \
  && apt-get install -y --no-install-recommends openssl ca-certificates tini gosu curl \
  && rm -rf /var/lib/apt/lists/*
 
-COPY --from=iii-image /app/iii /usr/local/bin/iii
-
 WORKDIR /opt/agentmemory
+ARG AGENTMEMORY_VERSION=0.9.30
+ARG III_VERSION=0.22.1
+ARG III_SDK_VERSION=0.22.1
+
 RUN [ "${III_VERSION}" = "${III_SDK_VERSION}" ] \
  || { echo "III_VERSION=${III_VERSION} and III_SDK_VERSION=${III_SDK_VERSION} must match" >&2; exit 1; }
-RUN printf '{"name":"agentmemory-deploy","version":"1.0.0","private":true,"overrides":{"iii-sdk":"%s"}}\n' "${III_SDK_VERSION}" > package.json \
+RUN --mount=type=cache,target=/root/.npm \
+    printf '{"name":"agentmemory-deploy","version":"1.0.0","private":true,"overrides":{"iii-sdk":"%s"}}\n' "${III_SDK_VERSION}" > package.json \
  && npm install "@agentmemory/agentmemory@${AGENTMEMORY_VERSION}" --omit=optional --no-fund --no-audit \
  && ln -s /opt/agentmemory/node_modules/.bin/agentmemory /usr/local/bin/agentmemory
+
+COPY --from=iii-image /app/iii /usr/local/bin/iii
 
 ENV AGENTMEMORY_III_VERSION=${III_VERSION} \
     TINI_SUBREAPER=1

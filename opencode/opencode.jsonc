@@ -5,8 +5,8 @@
       "npm": "@ai-sdk/anthropic",
       "name": "anthropic",
       "options": {
-        "baseURL": "{env:ANTHROPIC_BASE_URL}/v1",
-        "apiKey": "{env:ANTHROPIC_AUTH_TOKEN}",
+        "baseURL": "{env:AXONHUB_BASE_URL}/v1",
+        "apiKey": "{env:AXONHUB_AUTH_TOKEN}",
         "disableMaxOutputTokens": true,
         "setCacheKey": true
       },
@@ -191,8 +191,8 @@
       "npm": "@ai-sdk/openai",
       "api": "responses",
       "options": {
-        "baseURL": "{env:OPENAI_BASE_URL}",
-        "apiKey": "{env:OPENAI_AUTH_TOKEN}",
+        "baseURL": "{env:AXONHUB_BASE_URL}",
+        "apiKey": "{env:AXONHUB_AUTH_TOKEN}",
         "disableMaxOutputTokens": true,
         "truncation": "auto",
         "headerTimeout": 60000,
@@ -203,7 +203,10 @@
         "gpt-5.5",
         "gpt-5.6-sol",
         "gpt-5.6-terra",
-        "gpt-5.6-luna"
+        "gpt-5.6-luna",
+        "gpt-6-astra",
+        "gpt-6.1-sol",
+        "gpt-6-luna"
       ],
       "models": {
         "gpt-5.5": {
@@ -390,6 +393,141 @@
               "textVerbosity": "medium"
             }
           }
+        },
+        "gpt-6-astra": {
+          "limit": {
+            "context": 1050000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "name": "gpt-6-astra",
+          "reasoning": true,
+          "tool_call": true,
+          "variants": {
+            "high": {
+              "reasoningEffort": "high",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "max": {
+              "reasoningEffort": "max",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            }
+          }
+        },
+        "gpt-6.1-sol": {
+          "limit": {
+            "context": 1050000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "name": "gpt-6.1-sol",
+          "reasoning": true,
+          "tool_call": true,
+          "variants": {
+            "high": {
+              "reasoningEffort": "high",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "max": {
+              "reasoningEffort": "max",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            }
+          }
+        },
+        "gpt-6-luna": {
+          "limit": {
+            "context": 1050000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "name": "gpt-6-luna",
+          "reasoning": true,
+          "tool_call": true,
+          "variants": {
+            "high": {
+              "reasoningEffort": "high",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "max": {
+              "reasoningEffort": "max",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            }
+          }
         }
       }
     }
@@ -487,6 +625,7 @@
     }
   },
   "plugin": [
+    "oh-my-opencode-slim@latest",
     "opencode-axonhub-tracing@1.1.0",
     "./plugins/agentmemory-capture.ts",
     "./plugins/permission-audit.ts",
@@ -502,11 +641,21 @@
     ]
   },
   "agent": {
-    "plan": {
-      "model": "openai/gpt-5.5"
-    },
     "build": {
-      "model": "openai/gpt-5.5"
+      "model": "openai/gpt-6.1-sol",
+      "variant": "medium"
+    },
+    "plan": {
+      "model": "openai/gpt-6-astra",
+      "variant": "low"
+    },
+    "general": {
+      "model": "openai/gpt-6.1-sol",
+      "variant": "medium"
+    },
+    "explore": {
+      "model": "openai/gpt-6-luna",
+      "variant": "medium"
     }
   },
   "autoupdate": "notify",
@@ -515,8 +664,8 @@
     "openai",
     "anthropic"
   ],
-  "username": "xyuzou",
-  "small_model": "openai/gpt-5.6-luna",
+  "username": "chalice-1831",
+  "small_model": "openai/gpt-6-luna",
   "permission": {
     // Baseline: unknown capabilities ask by default. Specific safe tools are allowed below.
     "bash": {

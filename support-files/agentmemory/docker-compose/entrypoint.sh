@@ -22,11 +22,7 @@ workers:
       host: 0.0.0.0
       default_timeout: 180000
       cors:
-        allowed_origins:
-          - "http://localhost:3111"
-          - "http://localhost:3113"
-          - "http://127.0.0.1:3111"
-          - "http://127.0.0.1:3113"
+        allowed_origins: ["http://localhost:3111", "http://localhost:3113", "http://127.0.0.1:3111", "http://127.0.0.1:3113"]
         allowed_methods: [GET, POST, PUT, DELETE, OPTIONS]
   - name: iii-state
     config:

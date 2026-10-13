@@ -82,12 +82,17 @@ TARGET_DIR=/path/to/mise-config ./mise.sh link
 ./mise.sh diff
 ```
 
-`opencode.sh` 默认把这些文件链接到 `~/.config/opencode`：
+`opencode.sh` 默认把这些文件以文件级符号链接链接到 `~/.config/opencode`：
 
 - `AGENTS.md`
 - `AGENTS-compression-guide.md`
 - `opencode/*.jsonc`
 - `opencode/*.json`
+
+脚本不会把整个 `~/.config/opencode` 目录替换成仓库目录，因此会保留 OpenCode 的
+`logs/`、`node_modules/` 等本机运行时状态。`link` 会在替换已有本地文件前保存备份，
+备份位于目标目录下的 `backups/opencode.*`。脚本可从任意工作目录调用，源文件始终按
+`opencode.sh` 所在的仓库目录解析；`diff` 要求目标是指向本仓库的 managed symlink。
 
 可通过环境变量调整目标目录：
 
@@ -104,8 +109,8 @@ EXTRA_FILES="extra.md another.jsonc" ./opencode.sh link
 当前支持的命令：
 
 ```text
-link    创建或更新符号链接
-diff    对比仓库配置和目标目录配置
+link    创建或更新符号链接；替换冲突文件前自动备份
+diff    检查仓库配置对应的 managed symlink
 backup  占位命令，尚未实现
 ```
 
@@ -171,4 +176,5 @@ mise install
 - `opencode.jsonc` 中的 provider 使用环境变量读取凭据，不应把真实 token 写入仓库。
 - `backup` 命令目前只是占位；需要备份时请先手动复制目标目录。
 - OpenCode 配置支持 JSON / JSONC，并会合并 global、project、custom config 等多层配置；本仓库主要面向 global config 使用。
+- OpenCode 默认从 `XDG_CONFIG_HOME/opencode`（未设置时为 `~/.config/opencode`）加载全局配置；除非明确设置 `OPENCODE_CONFIG_DIR`、`OPENCODE_CONFIG` 或 `OPENCODE_CONFIG_CONTENT`，否则不要用这些变量绕过本脚本管理的目录。
 - MCP server 会增加上下文占用，启用过多工具时需要关注上下文窗口和响应成本。

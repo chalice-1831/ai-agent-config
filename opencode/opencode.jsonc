@@ -685,6 +685,19 @@
       "gh api /repos/*/*/comments/* --template *": "allow",
       "gh api /repos/*/*/pull/files *": "allow",
       "gh api repos/*/*/issues/*/timeline *": "allow",
+      // Read-only GitHub API resources approved from permission history.
+      // Read-only endpoints are allowed; request-body and method controls below still win last.
+      "gh api repos/*/*/pulls*": "allow",
+      "gh api repos/*/*/issues/*/comments*": "allow",
+      "gh api repos/*/*/issues/*/timeline*": "allow",
+      "gh api repos/*/*/commits*": "allow",
+      "gh api repos/*/*/releases*": "allow",
+      "gh api repos/*/*/branches*": "allow",
+      "gh api repos/*/*/tags*": "allow",
+      // Second-layer read-only resources. Environments and secrets are intentionally omitted.
+      "gh api repos/*/*/contents*": "allow",
+      "gh api repos/*/*/actions/runs*": "allow",
+      "gh api repos/*/*/workflows*": "allow",
       // Keep request-body/method controls behind ask even after a comments read allow.
       "gh api * -f *": "ask",
       "gh api * -f=*": "ask",
@@ -700,6 +713,14 @@
       "gh api * -X=*": "ask",
       "gh api * --method *": "ask",
       "gh api * --method=*": "ask",
+      "gh api * --verbose": "ask",
+      "gh api * --verbose *": "ask",
+      "gh api * --header *": "ask",
+      "gh api * --header=*": "ask",
+      "gh api * -H *": "ask",
+      "gh api * -H=*": "ask",
+      "gh api * --hostname *": "ask",
+      "gh api * --hostname=*": "ask",
       "gh auth token": "deny",
       "gh auth token *": "deny",
       "gh auth status --show-token": "deny",
@@ -766,6 +787,7 @@
       "git rev-parse *": "allow",
       "git rev-list *": "allow",
       "git merge-tree *": "allow",
+      "git merge --ff-only origin/main": "allow",
       "git merge-base *": "allow",
       "git ls-remote *": "allow",
       "git ls-files *": "allow",
@@ -1071,7 +1093,6 @@
       "~/.cache/opencode/**": "allow",
       "~/.cache/oh-my-opencode/**": "allow",
       "~/.cache/oh-my-openagent/**": "allow",
-      "~/.cache/opencode/**": "allow",
       "/tmp/opencode/**": "allow"
     }
   },

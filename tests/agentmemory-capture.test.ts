@@ -228,7 +228,7 @@ test("keeps non-empty agentmemory search tool results", async () => {
   expect(observations[0].data.tool_name).toBe("agentmemory_memory_recall");
 });
 
-test("skips session updates that only contain file names", async () => {
+test("skips session updates even with titles or change summaries", async () => {
   const requests: Array<{ url: string; body: any }> = [];
   globalThis.fetch = (async (url, init) => {
     requests.push({ url: String(url), body: JSON.parse(String(init?.body)) });
@@ -240,9 +240,17 @@ test("skips session updates that only contain file names", async () => {
     sessionID: "session-7",
     info: {
       id: "session-7",
+      title: "Update agentmemory capture",
       summary: {
         files: ["register_defs.go", "oper_def_uninstall_node.go", "backend/AGENTS.md"],
       },
+    },
+  } } as any });
+  await plugin.event?.({ event: { type: "session.updated", properties: {
+    info: {
+      id: "session-7",
+      title: "Update agentmemory capture",
+      summary: { additions: 2, deletions: 1, files: 1 },
     },
   } } as any });
 

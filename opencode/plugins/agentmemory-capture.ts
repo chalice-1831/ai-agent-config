@@ -392,25 +392,6 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         }
       }
 
-      // ── session.updated ──
-      if (type === "session.updated") {
-        const info = props.info as Record<string, unknown> | undefined;
-        const sid = (info?.id as string) || props.sessionID || activeSessionId;
-        if (!sid) return;
-        const summary = (info?.summary as Record<string, unknown> | undefined) || {};
-        const additions = typeof summary.additions === "number" ? summary.additions : 0;
-        const deletions = typeof summary.deletions === "number" ? summary.deletions : 0;
-        const title = typeof info?.title === "string" && info.title.length > 0 ? info.title : null;
-        if (!title && additions === 0 && deletions === 0) return;
-        await observe(sid, "session_updated", {
-          title,
-          parentID: info?.parentID ?? null,
-          additions,
-          deletions,
-          files: Array.isArray(summary.files) && (additions > 0 || deletions > 0) ? summary.files : null,
-        });
-      }
-
       // ── session.diff ──
       if (type === "session.diff") {
         const sid = props.sessionID || activeSessionId;

@@ -1126,8 +1126,6 @@
         "$FILE"
       ],
       "extensions": [
-        ".yaml",
-        ".yml",
         ".md"
       ]
     }

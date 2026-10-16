@@ -1,6 +1,6 @@
 ## ai-agent-config
 
-个人使用的 OpenCode / OhMyOpenCode 配置仓库，用来集中维护全局 agent 规则、OpenCode 配置、MCP 工具、插件和常用 skills 安装脚本。
+个人使用的 OpenCode 配置仓库，用来集中维护全局 agent 规则、OpenCode 配置、MCP 工具、插件和常用 skills 安装脚本。
 
 这个仓库的目标不是做成通用发行版，而是把我自己的 AI 编程环境配置沉淀成可复用、可审计、可快速同步的版本化配置。其他人可以参考结构或 fork 后按自己的模型、密钥和工具链调整。
 
@@ -17,9 +17,8 @@
 ├── codex/                       # 共享 MCP、命令规则及安装说明
 ├── opencode/
 │   ├── opencode.jsonc           # OpenCode 主配置：providers、MCP、plugins、permissions、formatters
-│   ├── oh-my-openagent.jsonc    # OhMyOpenAgent agents / categories / fallback 配置
 │   ├── dcp.jsonc                # Dynamic Context Pruning 配置
-│   └── tui.json                 # TUI 插件配置
+│   └── plugins/                 # 本地 OpenCode 插件
 ├── support-files/
 │   └── agentmemory/docker-compose/ # agentmemory Docker Compose 运行模板
 └── scripts/
@@ -82,14 +81,15 @@ TARGET_DIR=/path/to/mise-config ./mise.sh link
 ./mise.sh diff
 ```
 
-`opencode.sh` 默认把这些文件以文件级符号链接链接到 `~/.config/opencode`：
+`opencode.sh` 默认把这些文件以文件级符号链接链接到
+`${XDG_CONFIG_HOME:-$HOME/.config}/opencode`：
 
 - `AGENTS.md`
 - `AGENTS-compression-guide.md`
 - `opencode/*.jsonc`
 - `opencode/*.json`
 
-脚本不会把整个 `~/.config/opencode` 目录替换成仓库目录，因此会保留 OpenCode 的
+脚本不会把整个 `${XDG_CONFIG_HOME:-$HOME/.config}/opencode` 目录替换成仓库目录，因此会保留 OpenCode 的
 `logs/`、`node_modules/` 等本机运行时状态。`link` 会在替换已有本地文件前保存备份，
 备份位于目标目录下的 `backups/opencode.*`。脚本可从任意工作目录调用，源文件始终按
 `opencode.sh` 所在的仓库目录解析；`diff` 要求目标是指向本仓库的 managed symlink。
@@ -131,17 +131,13 @@ backup  占位命令，尚未实现
 - MCP：启用 `codegraph`、`sequential-thinking`、`exa`、`context7`、`deepwiki`、`gh_grep`、`mise`、`agentmemory` 等工具；`serena` 配置暂时保留但禁用，便于回滚。
 - CodeGraph 负责当前代码结构、符号、调用边、路由和影响面查询；AgentMemory 负责历史会话、决策、偏好和 post-mortem 检索。处理历史 bug 时先查 AgentMemory，再用 CodeGraph 检查当前代码。
 - CodeGraph CLI 由 `mise.toml` 安装；每个需要索引的项目仍需执行一次 `codegraph init` 建立本地 `.codegraph/` 索引。
-- plugins：启用 tracing、Markdown table formatter、DCP、OhMyOpenAgent。
+- plugins：启用 tracing、AgentMemory、权限审计和 ACP 等插件。
 - permissions：对常用只读命令放行，对破坏性 Git、Docker、Kubernetes、文件删除、密钥文件读写等操作设置 ask / deny。
 - formatters：为 Go、Shell、Markdown / YAML 配置格式化命令。
 
 OpenCode 权限审计插件仅记录弹出的权限申请及用户回复，包括原始 `pattern` 和项目根目录路径，不会自动修改权限白名单。记录按小时写入用户级 JSONL 文件，默认存放在 `~/.local/state/opencode/permission-audit/`（可通过 `XDG_STATE_HOME` 更改位置），文件权限为 `0600`。插件不会自动清理记录，旧文件需手动删除；写入失败时会记录错误，并在 TUI 可用时提示，不阻断审批。
 
-`opencode/oh-my-openagent.jsonc` 维护 OhMyOpenAgent 的 agents 和 categories，例如编排、深度执行、咨询、检索、规划、评审、视觉工程、写作等角色，并配置模型与 fallback。
-
 `opencode/dcp.jsonc` 维护 Dynamic Context Pruning 策略，用于控制上下文裁剪、压缩提醒、保护工具输出和错误清理。
-
-`opencode/tui.json` 只加载 `oh-my-openagent/tui` 插件。
 
 ## Support Files
 

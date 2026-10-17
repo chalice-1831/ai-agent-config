@@ -33,23 +33,23 @@ npx skills add --agent opencode -g https://github.com/wshobson/agents --skill py
 npx skills add --agent opencode -g https://github.com/cli/cli/tree/trunk --skill gh -y
 npx skills add --agent opencode -g https://github.com/microsoft/playwright-cli --skill playwright-cli -y
 
-# Show the final global skill set for OpenCode.
-npx skills ls --agent opencode -g -y
-
 # MongoDB
 
-gh skill install --scope user --agent opencode https://github.com/mongodb/agent-skills mongodb-schema-design -y
-gh skill install --scope user --agent opencode https://github.com/mongodb/agent-skills mongodb-connection -y
-gh skill install --scope user --agent opencode https://github.com/mongodb/agent-skills mongodb-query-optimizer -y
+gh skill install --scope user --agent opencode https://github.com/mongodb/agent-skills mongodb-schema-design --force
+gh skill install --scope user --agent opencode https://github.com/mongodb/agent-skills mongodb-connection --force
+gh skill install --scope user --agent opencode https://github.com/mongodb/agent-skills mongodb-query-optimizer --force
 
 # Redis
-gh skill install --scope user --agent opencode https://github.com/redis/agent-skills redis-connections -y
-gh skill install --scope user --agent opencode https://github.com/redis/agent-skills redis-clustering -y
-gh skill install --scope user --agent opencode https://github.com/redis/agent-skills redis-core -y
-gh skill install --scope user --agent opencode https://github.com/redis/agent-skills redis-search -y
+gh skill install --scope user --agent opencode https://github.com/redis/agent-skills redis-connections --force
+gh skill install --scope user --agent opencode https://github.com/redis/agent-skills redis-clustering --force
+gh skill install --scope user --agent opencode https://github.com/redis/agent-skills redis-core --force
+gh skill install --scope user --agent opencode https://github.com/redis/agent-skills redis-search --force
 
 npx skills add --agent opencode -g https://github.com/kepano/obsidian-skills.git -y
 
 npx skills add --agent opencode -g https://github.com/grafana/gcx.git -y
 
 npx skills add --agent opencode -g rohitg00/agentmemory -y
+
+# Show the final global skill set for OpenCode.
+npx skills ls --agent opencode -g -y

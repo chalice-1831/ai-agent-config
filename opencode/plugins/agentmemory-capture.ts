@@ -11,6 +11,7 @@ const API = process.env.AGENTMEMORY_URL || "http://localhost:3111";
 const FILE_TOOLS = new Set(["read", "write", "edit", "glob", "grep"]);
 const FILE_KEYS = ["filePath", "file_path", "path", "file", "pattern"];
 const MAX_STASHED_FILES = 20;
+const SESSION_END_COMMAND = "session-end";
 
 const DEBUG = process.env.OPENCODE_AGENTMEMORY_DEBUG === "1";
 function usableSecret(value: unknown): string {
@@ -102,6 +103,7 @@ async function observe(
   hookType: string,
   data: Record<string, unknown>,
 ): Promise<void> {
+  if (endedSessions.has(sessionId)) return;
   const proj = projectFor(sessionId);
   await post("/observe", {
     hookType,
@@ -115,6 +117,7 @@ async function observe(
 
 let activeSessionId: string | null = null;
 let pendingConfig: Record<string, unknown> | null = null;
+const endedSessions = new Set<string>();
 // Default scope resolved at plugin init (same resolution order as the hooks'
 // resolveProject: env override, git toplevel basename, cwd basename). In a
 // long-lived OpenCode process serving multiple directories these defaults are
@@ -312,6 +315,18 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
   defaultProjectCwd = ctx.worktree || ctx.project?.id || process.cwd();
   defaultProjectName = resolveProjectName(defaultProjectCwd);
 
+  async function endSession(sid: string): Promise<void> {
+    if (endedSessions.has(sid)) return;
+    endedSessions.add(sid);
+    await post("/session/end", { sessionId: sid });
+    post("/crystals/auto", { olderThanDays: 7 }, 30000);
+    post("/consolidate-pipeline", { tier: "all", force: true }, 30000);
+    if (sid === activeSessionId) activeSessionId = null;
+    pruneSessionMaps(sid);
+    startContextCache.delete(sid);
+    contextInjectedSessions.delete(sid);
+  }
+
   return {
     event: async ({ event }) => {
       const type = event.type;
@@ -371,7 +386,7 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "session.status") {
         const status = props.status as Record<string, unknown> | undefined;
         const sid = props.sessionID || activeSessionId;
-        if (!sid || !status) return;
+        if (!sid || !status || endedSessions.has(sid)) return;
         if (status.type === "idle") {
           await post("/summarize", { sessionId: sid });
         }
@@ -387,7 +402,7 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       // ── session.compacted ──
       if (type === "session.compacted") {
         const sid = props.sessionID || activeSessionId;
-        if (sid) {
+        if (sid && !endedSessions.has(sid)) {
           await post("/summarize", { sessionId: sid });
         }
       }
@@ -415,13 +430,7 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
           if (DEBUG) console.error("[agentmemory] session.deleted with no session ID");
           return;
         }
-        await post("/session/end", { sessionId: sid });
-        post("/crystals/auto", { olderThanDays: 7 }, 30000);
-        post("/consolidate-pipeline", { tier: "all", force: true }, 30000);
-        if (sid === activeSessionId) activeSessionId = null;
-        pruneSessionMaps(sid);
-        startContextCache.delete(sid);
-        contextInjectedSessions.delete(sid);
+        await endSession(sid);
       }
 
       // ── session.error ──
@@ -731,7 +740,9 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       // ── command.executed ──
       if (type === "command.executed") {
         const sid = props.sessionID || activeSessionId;
-        if (sid) {
+        if (sid && String(props.name ?? "").replace(/^\//, "") === SESSION_END_COMMAND) {
+          await endSession(sid);
+        } else if (sid) {
           await observe(sid, "command_executed", {
             name: props.name,
             arguments: props.arguments || "",
@@ -800,7 +811,7 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
     // ── experimental.chat.system.transform ──
     "experimental.chat.system.transform": async (input, output) => {
       const sid = input.sessionID || activeSessionId;
-      if (!sid) return;
+      if (!sid || endedSessions.has(sid)) return;
 
       if (!contextInjectedSessions.has(sid)) {
         if (!Array.isArray(output.system)) return;
@@ -846,7 +857,7 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
     // ── experimental.session.compacting (WIP) ──
     "experimental.session.compacting": async (input, output) => {
       const sid = input.sessionID || activeSessionId;
-      if (!sid) return;
+      if (!sid || endedSessions.has(sid)) return;
 
       const result = await postJson("/context", {
         sessionId: sid,

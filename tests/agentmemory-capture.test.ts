@@ -44,6 +44,28 @@ test("correlates permission replies with the permission prompt context", async (
   expect(JSON.stringify(observations)).not.toContain("private");
 });
 
+test("ends a session from the session-end command and ignores later capture", async () => {
+  const requests: Array<{ url: string; body: any }> = [];
+  globalThis.fetch = (async (url, init) => {
+    requests.push({ url: String(url), body: JSON.parse(String(init?.body)) });
+    return new Response("{}", { status: 200 });
+  }) as typeof fetch;
+  const plugin = await AgentmemoryCapturePlugin({ worktree: process.cwd(), directory: process.cwd() } as any);
+
+  await plugin.event?.({ event: { type: "command.executed", properties: {
+    name: "session-end",
+    sessionID: "session-ended",
+    arguments: "",
+  } } as any });
+  await plugin["chat.message"]?.({ sessionID: "session-ended" } as any, {
+    parts: [{ type: "text", text: "after end" }],
+  } as any);
+
+  expect(requests.filter((request) => request.url.endsWith("/agentmemory/session/end")).map((request) => request.body))
+    .toEqual([{ sessionId: "session-ended" }]);
+  expect(requests.filter((request) => request.url.endsWith("/agentmemory/observe"))).toEqual([]);
+});
+
 test("skips permission replies without prompt context", async () => {
   const requests: Array<{ url: string; body: any }> = [];
   globalThis.fetch = (async (url, init) => {

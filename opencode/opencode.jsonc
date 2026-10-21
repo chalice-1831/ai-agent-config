@@ -1,499 +1,83 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "anthropic": {
-      "npm": "@ai-sdk/anthropic",
-      "name": "anthropic",
-      "options": {
-        "baseURL": "{env:ANTHROPIC_BASE_URL}/v1",
-        "apiKey": "{env:ANTHROPIC_AUTH_TOKEN}",
-        "disableMaxOutputTokens": true,
-        "setCacheKey": true
-      },
-      "whitelist": [
-        "claude-sonnet-4-6",
-        "claude-opus-4-6",
-        "claude-opus-4-7",
-        "claude-haiku-4-5"
-      ],
-      "models": {
-        "claude-opus-4-7": {
-          "name": "claude-opus-4-7",
-          "attachment": false,
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 16000
-            }
-          },
-          "variants": {
-            "low": {
-              "effort": "low"
-            },
-            "medium": {
-              "effort": "high"
-            },
-            "high": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 32000
-              }
-            },
-            "xhigh": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 128000
-              },
-              "speed": "fast"
-            }
-          }
-        },
-        "claude-opus-4-6": {
-          "name": "claude-opus-4-6",
-          "attachment": false,
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 16000
-            }
-          },
-          "variants": {
-            "low": {
-              "effort": "low"
-            },
-            "medium": {
-              "effort": "high"
-            },
-            "high": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 32000
-              }
-            },
-            "xhigh": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 128000
-              },
-              "speed": "fast"
-            }
-          }
-        },
-        "claude-sonnet-4-6": {
-          "name": "claude-sonnet-4-6",
-          "attachment": false,
-          "limit": {
-            "context": 200000,
-            "output": 64000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 16000
-            }
-          },
-          "variants": {
-            "low": {
-              "effort": "low"
-            },
-            "medium": {
-              "effort": "high"
-            },
-            "high": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 16000
-              }
-            },
-            "xhigh": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 64000
-              }
-            }
-          }
-        },
-        "claude-haiku-4-5": {
-          "name": "claude-haiku-4-5",
-          "limit": {
-            "context": 200000,
-            "output": 64000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "variants": {
-            "low": {
-              "effort": "low"
-            },
-            "medium": {
-              "effort": "high"
-            },
-            "high": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 8000
-              }
-            },
-            "xhigh": {
-              "thinking": {
-                "type": "enabled",
-                "budgetTokens": 16000
-              }
-            }
-          }
-        }
-      }
-    },
-    "openai": {
-      "name": "openai",
-      "npm": "@ai-sdk/openai",
-      "api": "responses",
-      "options": {
-        "baseURL": "{env:OPENAI_BASE_URL}",
-        "apiKey": "{env:OPENAI_AUTH_TOKEN}",
-        "disableMaxOutputTokens": true,
-        "truncation": "auto",
-        "headerTimeout": 60000,
-        "timeout": 600000,
-        "chunkTimeout": 60000
-      },
-      "whitelist": [
-        "gpt-5.5",
-        "gpt-5.6-sol",
-        "gpt-5.6-terra",
-        "gpt-5.6-luna"
-      ],
-      "models": {
-        "gpt-5.5": {
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "gpt-5.5",
-          "interleaved": {
-            "field": "reasoning_content"
-          },
-          "variants": {
-            "high": {
-              "reasoningEffort": "high",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "low": {
-              "reasoningEffort": "low",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            }
-          }
-        },
-        "gpt-5.6-sol": {
-          "limit": {
-            "context": 272000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "gpt-5.6-sol",
-          "interleaved": {
-            "field": "reasoning_content"
-          },
-          "cost": {
-            "input": 5,
-            "output": 30,
-            "cache_read": 0.5
-          },
-          "reasoning": true,
-          "tool_call": true,
-          "variants": {
-            "high": {
-              "reasoningEffort": "high",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "low": {
-              "reasoningEffort": "low",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            }
-          }
-        },
-        "gpt-5.6-terra": {
-          "limit": {
-            "context": 272000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "gpt-5.6-terra",
-          "interleaved": {
-            "field": "reasoning_content"
-          },
-          "cost": {
-            "input": 2.5,
-            "output": 15,
-            "cache_read": 0.25
-          },
-          "reasoning": true,
-          "tool_call": true,
-          "variants": {
-            "high": {
-              "reasoningEffort": "high",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "low": {
-              "reasoningEffort": "low",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            }
-          }
-        },
-        "gpt-5.6-luna": {
-          "limit": {
-            "context": 272000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "gpt-5.6-luna",
-          "interleaved": {
-            "field": "reasoning_content"
-          },
-          "cost": {
-            "input": 1,
-            "output": 6,
-            "cache_read": 0.1
-          },
-          "reasoning": true,
-          "tool_call": true,
-          "variants": {
-            "high": {
-              "reasoningEffort": "high",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "low": {
-              "reasoningEffort": "low",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh",
-              "reasoningSummary": "auto",
-              "textVerbosity": "medium"
-            }
-          }
-        }
-      }
-    }
-  },
   "compaction": {
-    "auto": false,
-    "prune": false
+    "auto": true
   },
   "mcp": {
-    "serena": {
-      "type": "local",
-      "enabled": false,
-      "command": [
-        "uvx",
-        "--from",
-        "git+https://github.com/oraios/serena",
-        "serena",
-        "start-mcp-server",
-        "--context",
-        "ide",
-        "--open-web-dashboard",
-        "false",
-        "--project-from-cwd"
-      ]
-    },
-    "codegraph": {
-      "type": "local",
-      "enabled": true,
-      "command": [
-        "codegraph",
-        "serve",
-        "--mcp"
-      ]
-    },
-    "sequential-thinking": {
-      "type": "local",
-      "enabled": true,
-      "command": [
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
-    },
-    "exa": {
-      "type": "local",
-      "enabled": true,
-      "command": [
-        "npx",
-        "-y",
-        "exa-mcp-server"
-      ]
-    },
-    "context7": {
-      "type": "local",
-      "enabled": true,
-      "command": [
-        "npx",
-        "-y",
-        "@upstash/context7-mcp"
-      ]
-    },
-    "deepwiki": {
-      "type": "remote",
-      "enabled": true,
-      "url": "https://mcp.deepwiki.com/mcp"
-    },
-    "gh_grep": {
-      "type": "remote",
-      "enabled": true,
-      "url": "https://mcp.grep.app"
-    },
-    "mise": {
-      "type": "local",
-      "enabled": true,
-      "command": [
-        "mise",
-        "mcp"
-      ],
-      "environment": {
-        "MISE_EXPERIMENTAL": "1"
-      }
-    },
-    "agentmemory": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@agentmemory/mcp"
-      ],
-      "enabled": true,
-      "environment": {
-        "AGENTMEMORY_URL": "{env:AGENTMEMORY_URL}",
-        "AGENTMEMORY_SECRET": "{env:AGENTMEMORY_SECRET}"
+    "servers": {
+      "codegraph": {
+        "type": "local",
+        "disabled": false,
+        "command": [
+          "codegraph",
+          "serve",
+          "--mcp"
+        ]
+      },
+      "sequential-thinking": {
+        "type": "local",
+        "disabled": false,
+        "command": [
+          "npx",
+          "-y",
+          "@modelcontextprotocol/server-sequential-thinking"
+        ]
+      },
+      "exa": {
+        "type": "local",
+        "disabled": false,
+        "command": [
+          "npx",
+          "-y",
+          "exa-mcp-server"
+        ]
+      },
+      "context7": {
+        "type": "local",
+        "disabled": false,
+        "command": [
+          "npx",
+          "-y",
+          "@upstash/context7-mcp"
+        ]
+      },
+      "deepwiki": {
+        "type": "remote",
+        "disabled": false,
+        "url": "https://mcp.deepwiki.com/mcp"
+      },
+      "gh_grep": {
+        "type": "remote",
+        "disabled": false,
+        "url": "https://mcp.grep.app"
+      },
+      "mise": {
+        "type": "local",
+        "disabled": false,
+        "command": [
+          "mise",
+          "mcp"
+        ],
+        "environment": {
+          "MISE_EXPERIMENTAL": "1"
+        }
+      },
+      "agentmemory": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@agentmemory/mcp"
+        ],
+        "disabled": false,
+        "environment": {
+          "AGENTMEMORY_URL": "{env:AGENTMEMORY_URL}",
+          "AGENTMEMORY_SECRET": "{env:AGENTMEMORY_SECRET}"
+        }
       }
     }
   },
-  "plugin": [
-    "opencode-axonhub-tracing@1.1.0",
-    "./plugins/agentmemory-capture.ts",
-    "./plugins/agents-md-reminder/index.ts",
-    "./plugins/memory-activation-reminder/index.ts",
-    "./plugins/permission-audit.ts",
-    "opencode-acp@stable"
-  ],
+  "plugins": [],
   "share": "disabled",
   "watcher": {
     "ignore": [
@@ -503,600 +87,19 @@
       "*.log"
     ]
   },
-  "agent": {
+  "agents": {
+    "title": {
+      "model": "openai/luna-6"
+    },
     "plan": {
-      "model": "openai/gpt-5.5"
+      "model": "openai/sol-6.1"
     },
     "build": {
-      "model": "openai/gpt-5.5"
+      "model": "openai/sol-6.1"
     }
   },
-  "autoupdate": "notify",
-  "logLevel": "INFO",
-  "enabled_providers": [
-    "openai",
-    "anthropic"
-  ],
-  "username": "xyuzou",
-  "small_model": "openai/gpt-5.6-luna",
-  "permission": {
-    // Baseline: unknown capabilities ask by default. Specific safe tools are allowed below.
-    "bash": {
-      "*": "ask",
-      // Local read-only inspection and verification.
-      "pwd": "allow",
-      "defuddle *": "allow",
-      "data *": "allow",
-      "printf *": "allow",
-      "sleep *": "ask",
-      "ls *": "allow",
-      "find *": "allow",
-      "rg *": "allow",
-      "grep *": "allow",
-      "sed *": "allow",
-      "cat *": "allow",
-      "head *": "allow",
-      "tail *": "allow",
-      "less": "allow",
-      "which": "allow",
-      "wc *": "allow",
-      "sort *": "allow",
-      "diff *": "allow",
-      "jq *": "allow",
-      "yq *": "allow",
-      "echo *": "allow",
-      "curl *": "allow",
-      "go *": "allow",
-      "go1.25.12 *": "allow",
-      "gofmt *": "allow",
-      "pnpm run *": "allow",
-      "npm list *": "allow",
-      "pip list *": "allow",
-      "python *": "allow",
-      "dpkg *": "allow",
-      "php *": "allow",
-      "tmux": "allow",
-      "tmux *": "allow",
-      // GitHub CLI defaults to ask; read-only discovery is allowed, credential and destructive paths are denied later.
-      "gh *": "ask",
-      "gh --version": "allow",
-      "gh -h": "allow",
-      "gh --help": "allow",
-      "gh help": "allow",
-      "gh help *": "allow",
-      "gh status": "allow",
-      "gh status *": "allow",
-      // Auth status is allowed only without token-printing flags.
-      "gh auth status": "allow",
-      "gh auth status --json hosts": "allow",
-      "gh api user --jq .login": "allow",
-      // Common read-only GitHub CLI commands.
-      "gh search code *": "allow",
-      "gh search commits *": "allow",
-      "gh search issues *": "allow",
-      "gh search prs *": "allow",
-      "gh search repos *": "allow",
-      "gh repo view": "allow",
-      "gh repo view *": "allow",
-      "gh repo list": "allow",
-      "gh repo list *": "allow",
-      "gh repo ls": "allow",
-      "gh repo ls *": "allow",
-      "gh repo gitignore list": "allow",
-      "gh repo gitignore list *": "allow",
-      "gh repo gitignore view *": "allow",
-      "gh repo license list": "allow",
-      "gh repo license list *": "allow",
-      "gh repo license view *": "allow",
-      "gh repo autolink list": "allow",
-      "gh repo autolink list *": "allow",
-      "gh repo autolink view *": "allow",
-      "gh repo deploy-key list": "allow",
-      "gh repo deploy-key list *": "allow",
-      "gh repo read-dir *": "allow",
-      "gh pr view *": "allow",
-      "gh pr list": "allow",
-      "gh pr list *": "allow",
-      "gh pr ls": "allow",
-      "gh pr ls *": "allow",
-      "gh pr diff *": "allow",
-      "gh pr status": "allow",
-      "gh pr status *": "allow",
-      "gh pr checks *": "allow",
-      "gh issue create *": "allow",
-      "gh issue edit *": "allow",
-      "gh issue view *": "allow",
-      "gh issue list": "allow",
-      "gh issue list *": "allow",
-      "gh issue status": "allow",
-      "gh issue status *": "allow",
-      "gh issue comment *": "allow",
-      "gh discussion view *": "allow",
-      "gh discussion list": "allow",
-      "gh discussion list *": "allow",
-      "gh release view *": "allow",
-      "gh release list": "allow",
-      "gh release list *": "allow",
-      "gh release ls": "allow",
-      "gh release ls *": "allow",
-      "gh release verify *": "allow",
-      "gh release verify-asset *": "allow",
-      "gh run view *": "allow",
-      "gh run list": "allow",
-      "gh run list *": "allow",
-      "gh run ls": "allow",
-      "gh run ls *": "allow",
-      "gh workflow view *": "allow",
-      "gh workflow list": "allow",
-      "gh workflow list *": "allow",
-      "gh workflow ls": "allow",
-      "gh workflow ls *": "allow",
-      "gh label list": "allow",
-      "gh label list *": "allow",
-      "gh alias list": "allow",
-      "gh alias list *": "allow",
-      "gh skill list": "allow",
-      "gh skill list *": "allow",
-      "gh skill search *": "allow",
-      "gh skill preview *": "allow",
-      "gh project list": "allow",
-      "gh project list *": "allow",
-      "gh project view *": "allow",
-      "gh project field-list *": "allow",
-      "gh project item-list *": "allow",
-      "gh org list": "allow",
-      "gh org list *": "allow",
-      "gh ruleset check *": "allow",
-      "gh ruleset list": "allow",
-      "gh ruleset list *": "allow",
-      "gh ruleset view *": "allow",
-      "gh cache list": "allow",
-      "gh cache list *": "allow",
-      "gh agent-task list": "allow",
-      "gh agent-task list *": "allow",
-      "gh agent-task view *": "allow",
-      "gh gist list": "allow",
-      "gh gist list *": "allow",
-      "gh ssh-key list": "allow",
-      "gh gpg-key list": "allow",
-      "gh variable list": "allow",
-      "gh variable list *": "allow",
-      // gh api comment reads: GET-like comment endpoints plus local output formatting only.
-      "gh api repos/*/*/comments": "allow",
-      "gh api /repos/*/*/comments": "allow",
-      "gh api repos/*/*/comments -q *": "allow",
-      "gh api repos/*/*/comments --jq *": "allow",
-      "gh api repos/*/*/comments -t *": "allow",
-      "gh api repos/*/*/comments --template *": "allow",
-      "gh api /repos/*/*/comments -q *": "allow",
-      "gh api /repos/*/*/comments --jq *": "allow",
-      "gh api /repos/*/*/comments -t *": "allow",
-      "gh api /repos/*/*/comments --template *": "allow",
-      "gh api repos/*/*/comments/*": "allow",
-      "gh api /repos/*/*/comments/*": "allow",
-      "gh api repos/*/*/comments/* *": "ask",
-      "gh api /repos/*/*/comments/* *": "ask",
-      "gh api repos/*/*/comments/* -q *": "allow",
-      "gh api repos/*/*/comments/* --jq *": "allow",
-      "gh api repos/*/*/comments/* -t *": "allow",
-      "gh api repos/*/*/comments/* --template *": "allow",
-      "gh api /repos/*/*/comments/* -q *": "allow",
-      "gh api /repos/*/*/comments/* --jq *": "allow",
-      "gh api /repos/*/*/comments/* -t *": "allow",
-      "gh api /repos/*/*/comments/* --template *": "allow",
-      "gh api /repos/*/*/pull/files *": "allow",
-      "gh api repos/*/*/issues/*/timeline *": "allow",
-      // Read-only GitHub API resources approved from permission history.
-      // Read-only endpoints are allowed; request-body and method controls below still win last.
-      "gh api repos/*/*/pulls*": "allow",
-      "gh api repos/*/*/issues/*/comments*": "allow",
-      "gh api repos/*/*/issues/*/timeline*": "allow",
-      "gh api repos/*/*/commits*": "allow",
-      "gh api repos/*/*/releases*": "allow",
-      "gh api repos/*/*/branches*": "allow",
-      "gh api repos/*/*/tags*": "allow",
-      // Second-layer read-only resources. Environments and secrets are intentionally omitted.
-      "gh api repos/*/*/contents*": "allow",
-      "gh api repos/*/*/actions/runs*": "allow",
-      "gh api repos/*/*/workflows*": "allow",
-      // Keep request-body/method controls behind ask even after a comments read allow.
-      "gh api * -f *": "ask",
-      "gh api * -f=*": "ask",
-      "gh api * --raw-field *": "ask",
-      "gh api * --raw-field=*": "ask",
-      "gh api * -F *": "ask",
-      "gh api * -F=*": "ask",
-      "gh api * --field *": "ask",
-      "gh api * --field=*": "ask",
-      "gh api * --input *": "ask",
-      "gh api * --input=*": "ask",
-      "gh api * -X *": "ask",
-      "gh api * -X=*": "ask",
-      "gh api * --method *": "ask",
-      "gh api * --method=*": "ask",
-      "gh api * --verbose": "ask",
-      "gh api * --verbose *": "ask",
-      "gh api * --header *": "ask",
-      "gh api * --header=*": "ask",
-      "gh api * -H *": "ask",
-      "gh api * -H=*": "ask",
-      "gh api * --hostname *": "ask",
-      "gh api * --hostname=*": "ask",
-      "gh auth token": "deny",
-      "gh auth token *": "deny",
-      "gh auth status --show-token": "deny",
-      "gh auth status --show-token *": "deny",
-      "gh auth status * --show-token": "deny",
-      "gh auth status * --show-token *": "deny",
-      "gh auth status -t": "deny",
-      "gh auth status -t *": "deny",
-      "gh auth status * -t": "deny",
-      "gh auth status * -t *": "deny",
-      "gh auth logout": "deny",
-      "gh auth logout *": "deny",
-      "gh repo delete": "deny",
-      "gh repo delete *": "deny",
-      "gh repo archive": "deny",
-      "gh repo archive *": "deny",
-      "gh repo deploy-key delete": "deny",
-      "gh repo deploy-key delete *": "deny",
-      "gh issue delete": "deny",
-      "gh issue delete *": "deny",
-      "gh release delete": "deny",
-      "gh release delete *": "deny",
-      "gh release delete-asset": "deny",
-      "gh release delete-asset *": "deny",
-      "gh run delete": "deny",
-      "gh run delete *": "deny",
-      "gh project delete": "deny",
-      "gh project delete *": "deny",
-      "gh project field-delete": "deny",
-      "gh project field-delete *": "deny",
-      "gh project item-delete": "deny",
-      "gh project item-delete *": "deny",
-      "gh ssh-key delete": "deny",
-      "gh ssh-key delete *": "deny",
-      "gh gpg-key delete": "deny",
-      "gh gpg-key delete *": "deny",
-      "gh secret delete": "deny",
-      "gh secret delete *": "deny",
-      "gh gist delete": "deny",
-      "gh gist delete *": "deny",
-      "gh cache delete": "deny",
-      "gh cache delete *": "deny",
-      "gh codespace delete": "deny",
-      "gh codespace delete *": "deny",
-      "kubectl get *": "allow",
-      "kubectl describe *": "allow",
-      "kubectl logs *": "allow",
-      "docker compose ps *": "allow",
-      "docker compose logs *": "allow",
-      "docker ps *": "allow",
-      "docker logs *": "allow",
-      "docker images *": "allow",
-      "docker inspect *": "allow",
-      "docker manifest inspect *": "allow",
-      "docker build *": "allow",
-      // Git defaults to ask; read-only discovery is allowed, destructive force/delete paths are denied later.
-      "git *": "ask",
-      "git status *": "allow",
-      "git diff *": "allow",
-      "git grep *": "allow",
-      "git log *": "allow",
-      "git show *": "allow",
-      "git show-ref *": "allow",
-      "git rev-parse *": "allow",
-      "git rev-list *": "allow",
-      "git merge-tree *": "allow",
-      "git merge --ff-only origin/main": "allow",
-      "git merge-base *": "allow",
-      "git ls-remote *": "allow",
-      "git ls-files *": "allow",
-      "git for-each-ref *": "allow",
-      "git check-ignore *": "allow",
-      "git blame *": "allow",
-      "git branch -vv": "allow",
-      "git branch --show-current": "allow",
-      "git branch --show-current *": "allow",
-      "git branch --list": "allow",
-      "git branch --list *": "allow",
-      "git branch -r *": "allow",
-      "git fetch *": "allow",
-      "git remote -v": "allow",
-      "git remote show *": "allow",
-      "git remote get-url *": "allow",
-      "git switch *": "allow",
-      "git stash *": "allow",
-      "git tag -l *": "allow",
-      "git tag --list *": "allow",
-      "git tag -v *": "allow",
-      "git tag --verify *": "allow",
-      "git tag --short *": "allow",
-      "git path-id *": "allow",
-      "git worktree *": "allow",
-      "git push *": "allow",
-      "git push --force *": "deny",
-      "git push -f *": "deny",
-      "git push --force-with-lease *": "deny",
-      "git push --mirror *": "deny",
-      "git push --delete *": "deny",
-      "git push -d *": "deny",
-      "git push --all *": "deny",
-      "git push --tags": "deny",
-      "git push --tags *": "deny",
-      "git reset --hard": "deny",
-      "git reset --hard *": "deny",
-      "git clean -fdx *": "deny",
-      "git clean -fxd *": "deny",
-      "git clean -dfx *": "deny",
-      "git branch -D *": "deny",
-      "git tag --sort *": "allow",
-      "git describe *": "allow",
-      "git tag -d *": "deny",
-      "git tag --delete *": "deny",
-      "git tag -f *": "deny",
-      "git tag --force *": "deny",
-      "git stash drop *": "deny",
-      "git stash clear *": "deny",
-      "git filter-branch *": "deny",
-      "git prune *": "deny",
-      "git credential *": "deny",
-      "git credential-cache *": "deny",
-      "git credential-store *": "deny",
-      "git update-ref *": "deny",
-      "git symbolic-ref *": "deny",
-      "git update-index *": "deny",
-      "git read-tree *": "deny",
-      // In addition to the read‑only Git commands mentioned above, the following commands are also allowed.
-      "git add *": "allow",
-      "git commit *": "allow",
-      "git apply *": "allow",
-      "git checkout *": "allow",
-      "git worktree add *": "allow",
-      "base64 -d": "allow",
-      "nl -ba": "allow",
-      "xargs *": "allow",
-      // opencode related commands.
-      "opencode --version": "allow",
-      "opencode models": "allow",
-      // Commands that can change files, dependencies, infrastructure, or external state.
-      "cp *": "ask",
-      "mv *": "ask",
-      "mkdir *": "ask",
-      "tee *": "ask",
-      "npx *": "ask",
-      "bunx *": "ask",
-      "npm install *": "ask",
-      "npm uninstall *": "ask",
-      "npm publish *": "deny",
-      "npm link *": "ask",
-      "pnpm add *": "ask",
-      "pnpm remove *": "ask",
-      "pip install *": "ask",
-      "pip uninstall *": "ask",
-      "docker run *": "ask",
-      "docker exec *": "ask",
-      "docker rm *": "ask",
-      "docker rmi *": "ask",
-      "docker stop *": "ask",
-      "docker kill *": "ask",
-      "docker volume rm *": "ask",
-      "docker network rm *": "ask",
-      "kubectl apply *": "ask",
-      "kubectl delete *": "ask",
-      "kubectl exec *": "ask",
-      "kubectl edit *": "ask",
-      "kubectl patch *": "ask",
-      "kubectl scale *": "ask",
-      "kubectl cordon *": "ask",
-      "helm *": "ask",
-      "helm lint *": "allow",
-      "helm show *": "allow",
-      "helm version *": "allow",
-      "helm template *": "allow",
-      "helm dependency build *": "allow",
-      "rm -r *": "ask",
-      "rm *": "ask",
-      "rmdir *": "ask",
-      "chmod *": "ask",
-      "chown *": "ask",
-      "sudo *": "ask",
-      "sudo chmod *": "ask",
-      "sudo chown *": "ask",
-      "sudo systemctl *": "ask",
-      "sudo apt *": "ask",
-      // Destructive or privilege-sensitive commands stay denied even if broader ask rules match earlier.
-      "git clean -fd *": "ask",
-      "docker system prune *": "deny",
-      "kubectl drain *": "deny",
-      "rm -rf *": "deny",
-      "sudo rm *": "deny",
-      "ansible-playbook": "ask",
-      "ansible-playbook --syntax-check *": "allow",
-      "mise *": "ask",
-      "mise ls *": "allow",
-      "test *": "allow",
-      "awk *": "allow",
-      "true": "allow",
-      "command -v *": "allow",
-      "golangci-lint *": "allow",
-      // gcx: Grafana Cloud CLI. Unknown and mutating operations ask by default.
-      "gcx *": "ask",
-      // Read-only discovery and local context checks.
-      "gcx --help": "allow",
-      "gcx help *": "allow",
-      "gcx help-tree *": "allow",
-      "gcx commands *": "allow",
-      "gcx version": "allow",
-      "gcx version *": "allow",
-      "gcx providers list *": "allow",
-      "gcx config check": "allow",
-      "gcx config current-context": "allow",
-      "gcx config list-contexts *": "allow",
-      "gcx config path *": "allow",
-      "gcx config view": "allow",
-      "gcx config view -o json": "allow",
-      "gcx config view -o yaml": "allow",
-      // Resource and telemetry read-only operations.
-      "gcx resources get *": "allow",
-      "gcx resources list-types *": "allow",
-      "gcx resources list-examples *": "allow",
-      "gcx resources validate *": "allow",
-      "gcx dashboards list *": "allow",
-      "gcx dashboards search *": "allow",
-      "gcx dashboards get *": "allow",
-      "gcx dashboards list-versions *": "allow",
-      "gcx datasources list *": "allow",
-      "gcx datasources get *": "allow",
-      "gcx datasources health *": "allow",
-      "gcx datasources schemas *": "allow",
-      "gcx metrics labels *": "allow",
-      "gcx metrics metadata *": "allow",
-      "gcx metrics series *": "allow",
-      "gcx metrics query *": "allow",
-      "gcx logs labels *": "allow",
-      "gcx logs series *": "allow",
-      "gcx logs query *": "allow",
-      "gcx logs metrics *": "allow",
-      "gcx traces labels *": "allow",
-      "gcx traces query *": "allow",
-      "gcx traces get *": "allow",
-      "gcx traces metrics *": "allow",
-      "gcx profiles labels *": "allow",
-      "gcx profiles list-profile-types *": "allow",
-      "gcx profiles query *": "allow",
-      "gcx profiles metrics *": "allow",
-      "gcx profiles exemplars *": "allow",
-      // Credential, raw secret, and destructive operations stay denied.
-      "gcx login *": "deny",
-      "gcx cloud login *": "deny",
-      "gcx config view *--raw*": "deny",
-      "gcx config set *": "deny",
-      "gcx config unset *": "deny",
-      "gcx config edit *": "deny",
-      "gcx * delete *": "deny",
-      "gcx cloud stacks delete *": "deny",
-      "gcx resources delete *": "deny",
-      "gcx dashboards delete *": "deny",
-      "gcx alert notification-policies reset *": "deny",
-      "gcx agent prune *": "deny"
-    },
-    "read": {
-      "*": "allow",
-      "*.env": "deny",
-      "*.env.*": "deny",
-      "*.key": "deny",
-      "*.pem": "deny",
-      "*.p12": "deny",
-      "*.pfx": "deny",
-      "*.secret": "deny",
-      "*secret*": "deny",
-      "*token*": "deny",
-      "*credential*": "deny",
-      "*password*": "deny",
-      "*id_rsa*": "deny",
-      "*id_ed25519*": "deny",
-      "*kubeconfig*": "deny",
-      ".git/config": "deny",
-      "credentials/**": "deny",
-      "*/credentials/**": "deny",
-      "*/.ssh/**": "deny",
-      "*/.gnupg/**": "deny",
-      "*/secrets/**": "deny"
-    },
-    "glob": {
-      "*": "allow",
-      "*.env": "deny",
-      "*.env.*": "deny",
-      "*.key": "deny",
-      "*.pem": "deny",
-      "*.p12": "deny",
-      "*.pfx": "deny",
-      "*.secret": "deny",
-      "*secret*": "deny",
-      "*token*": "deny",
-      "*credential*": "deny",
-      "*password*": "deny",
-      "credentials/**": "deny",
-      "*/credentials/**": "deny",
-      "*/.ssh/**": "deny",
-      "*/.gnupg/**": "deny",
-      "*/secrets/**": "deny"
-    },
-    "grep": {
-      "*": "allow",
-      "*.env": "deny",
-      "*.env.*": "deny",
-      "*.key": "deny",
-      "*.pem": "deny",
-      "*.p12": "deny",
-      "*.pfx": "deny",
-      "*.secret": "deny",
-      "*secret*": "deny",
-      "*token*": "deny",
-      "*credential*": "deny",
-      "*password*": "deny",
-      "credentials/**": "deny",
-      "*/credentials/**": "deny",
-      "*/.ssh/**": "deny",
-      "*/.gnupg/**": "deny",
-      "*/secrets/**": "deny"
-    },
-    "edit": {
-      "*": "ask",
-      "opencode/**": "allow",
-      "AGENTS.md": "allow",
-      "~/.config/opencode/**": "allow",
-      "*.env": "deny",
-      "*.env.*": "deny",
-      "*.key": "deny",
-      "*.pem": "deny",
-      "*.p12": "deny",
-      "*.pfx": "deny",
-      "*.secret": "deny",
-      "*secret*": "deny",
-      "*token*": "deny",
-      "*credential*": "deny",
-      "*password*": "deny",
-      "credentials/**": "deny",
-      "*/credentials/**": "deny",
-      "*/.ssh/**": "deny",
-      "*/secrets/**": "deny"
-    },
-    "write": {
-      "*": "ask",
-      "opencode/**": "allow",
-      "AGENTS.md": "allow",
-      "~/.config/opencode/**": "allow",
-      "*.env": "deny",
-      "*.env.*": "deny",
-      "*.key": "deny",
-      "*.pem": "deny",
-      "*.p12": "deny",
-      "*.pfx": "deny",
-      "*.secret": "deny",
-      "*secret*": "deny",
-      "*token*": "deny",
-      "*credential*": "deny",
-      "*password*": "deny",
-      "credentials/**": "deny",
-      "*/credentials/**": "deny",
-      "*/.ssh/**": "deny",
-      "*/secrets/**": "deny"
-    },
-    "interactive_bash": "ask",
-    "mise_*": "ask",
-    "external_directory": {
-      "*": "ask",
-      "/tmp/**": "allow",
-      "~/.config/opencode/**": "allow",
-      "~/.agents/skills/**": "allow",
-      "~/.cache/opencode/**": "allow",
-      "~/.cache/oh-my-opencode/**": "allow",
-      "~/.cache/oh-my-openagent/**": "allow",
-      "/tmp/opencode/**": "allow"
-    }
-  },
+  "model": "openai/sol-6.1",
+  "update": "notify",
   "formatter": {
     "gofmt": {
       "command": [
@@ -1130,5 +133,3125 @@
         ".md"
       ]
     }
-  }
+  },
+  "providers": {
+    "anthropic": {
+      "name": "anthropic",
+      "package": "@opencode/ai/providers/anthropic",
+      "settings": {
+        "baseURL": "{env:ANTHROPIC_BASE_URL}/v1",
+        "apiKey": "{env:ANTHROPIC_AUTH_TOKEN}",
+        "disableMaxOutputTokens": true
+      },
+      "models": {
+        "opus-5-5": {
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          },
+          "modelID": "opus-5-5",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ],
+            "reasoning": {
+              "supported": true
+            }
+          },
+          "settings": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 16000
+            }
+          },
+          "variants": [
+            {
+              "id": "low",
+              "settings": {
+                "effort": "low"
+              }
+            },
+            {
+              "id": "medium",
+              "settings": {
+                "effort": "high"
+              }
+            },
+            {
+              "id": "high",
+              "settings": {
+                "thinking": {
+                  "type": "enabled",
+                  "budgetTokens": 32000
+                }
+              }
+            },
+            {
+              "id": "xhigh",
+              "settings": {
+                "thinking": {
+                  "type": "enabled",
+                  "budgetTokens": 128000
+                },
+                "speed": "fast"
+              }
+            }
+          ]
+        },
+        "sonnet-5-5": {
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          },
+          "modelID": "sonnet-5-5",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ],
+            "reasoning": {
+              "supported": true
+            }
+          },
+          "settings": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 16000
+            }
+          },
+          "variants": [
+            {
+              "id": "low",
+              "settings": {
+                "effort": "low"
+              }
+            },
+            {
+              "id": "medium",
+              "settings": {
+                "effort": "high"
+              }
+            },
+            {
+              "id": "high",
+              "settings": {
+                "thinking": {
+                  "type": "enabled",
+                  "budgetTokens": 32000
+                }
+              }
+            },
+            {
+              "id": "xhigh",
+              "settings": {
+                "thinking": {
+                  "type": "enabled",
+                  "budgetTokens": 128000
+                },
+                "speed": "fast"
+              }
+            }
+          ]
+        },
+        "haiku-5-5": {
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          },
+          "modelID": "haiku-5-5",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ],
+            "reasoning": {
+              "supported": true
+            }
+          },
+          "settings": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 16000
+            }
+          },
+          "variants": [
+            {
+              "id": "low",
+              "settings": {
+                "effort": "low"
+              }
+            },
+            {
+              "id": "medium",
+              "settings": {
+                "effort": "high"
+              }
+            },
+            {
+              "id": "high",
+              "settings": {
+                "thinking": {
+                  "type": "enabled",
+                  "budgetTokens": 32000
+                }
+              }
+            },
+            {
+              "id": "xhigh",
+              "settings": {
+                "thinking": {
+                  "type": "enabled",
+                  "budgetTokens": 128000
+                },
+                "speed": "fast"
+              }
+            }
+          ]
+        }
+      },
+      "compatibility": {
+        "supportsPromptCacheKey": true
+      }
+    },
+    "openai": {
+      "name": "openai",
+      "package": "@opencode/ai/providers/openai/responses",
+      "settings": {
+        "baseURL": "{env:OPENAI_BASE_URL}",
+        "apiKey": "{env:OPENAI_AUTH_TOKEN}",
+        "transport": "websocket",
+        "disableMaxOutputTokens": true,
+        "headerTimeout": 60000,
+        "timeout": 600000,
+        "chunkTimeout": 60000
+      },
+      "models": {
+        "astra-6": {
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          },
+          "modelID": "astra-6",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ],
+            "reasoning": {
+              "supported": true
+            }
+          },
+          "compatibility": {
+            "reasoningField": "reasoning_content"
+          },
+          "variants": [
+            {
+              "id": "high",
+              "settings": {
+                "reasoningEffort": "high",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "low",
+              "settings": {
+                "reasoningEffort": "low",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "medium",
+              "settings": {
+                "reasoningEffort": "medium",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "xhigh",
+              "settings": {
+                "reasoningEffort": "xhigh",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            }
+          ]
+        },
+        "sol-6.1": {
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "cost": {
+            "input": 5,
+            "output": 30,
+            "cache": {
+              "read": 0.5
+            }
+          },
+          "modelID": "sol-6.1",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ],
+            "reasoning": {
+              "supported": true
+            }
+          },
+          "compatibility": {
+            "reasoningField": "reasoning_content"
+          },
+          "variants": [
+            {
+              "id": "high",
+              "settings": {
+                "reasoningEffort": "high",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "low",
+              "settings": {
+                "reasoningEffort": "low",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "medium",
+              "settings": {
+                "reasoningEffort": "medium",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "xhigh",
+              "settings": {
+                "reasoningEffort": "xhigh",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            }
+          ]
+        },
+        "luna-6": {
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          },
+          "modelID": "luna-6",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ],
+            "reasoning": {
+              "supported": true
+            }
+          },
+          "compatibility": {
+            "reasoningField": "reasoning_content"
+          },
+          "variants": [
+            {
+              "id": "high",
+              "settings": {
+                "reasoningEffort": "high",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "low",
+              "settings": {
+                "reasoningEffort": "low",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "medium",
+              "settings": {
+                "reasoningEffort": "medium",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            },
+            {
+              "id": "xhigh",
+              "settings": {
+                "reasoningEffort": "xhigh",
+                "reasoningSummary": "auto",
+                "textVerbosity": "medium"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "policies": [
+    {
+      "action": "provider.use",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "openai",
+      "effect": "allow"
+    },
+    {
+      "action": "provider.use",
+      "resource": "anthropic",
+      "effect": "allow"
+    }
+  ],
+  "permissions": [
+    {
+      "action": "shell",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "pwd",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "defuddle *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "data *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "printf *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sleep *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "ls *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "find *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "rg *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "grep *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sed *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "cat *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "head *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "tail *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "less",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "which",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "wc *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sort *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "diff *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "jq *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "yq *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "echo *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "curl *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "go *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "go1.25.12 *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gofmt *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pnpm run *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "npm list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pip list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "dpkg *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "php *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "tmux",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "tmux *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh --version",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh -h",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh --help",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh help",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh help *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh status",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh status *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status --json hosts",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api user --jq .login",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh search code *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh search commits *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh search issues *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh search prs *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh search repos *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo view",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo ls",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo ls *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo gitignore list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo gitignore list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo gitignore view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo license list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo license list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo license view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo autolink list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo autolink list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo autolink view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo deploy-key list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo deploy-key list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo read-dir *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr ls",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr ls *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr diff *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr status",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr status *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh pr checks *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue create *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue edit *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue status",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue status *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue comment *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh discussion view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh discussion list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh discussion list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release ls",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release ls *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release verify *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release verify-asset *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh run view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh run list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh run list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh run ls",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh run ls *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh workflow view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh workflow list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh workflow list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh workflow ls",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh workflow ls *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh label list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh label list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh alias list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh alias list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh skill list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh skill list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh skill search *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh skill preview *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project field-list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project item-list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh org list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh org list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh ruleset check *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh ruleset list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh ruleset list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh ruleset view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh cache list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh cache list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh agent-task list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh agent-task list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh agent-task view *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh gist list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh gist list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh ssh-key list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh gpg-key list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh variable list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh variable list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments -q *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments --jq *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments -t *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments --template *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments -q *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments --jq *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments -t *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments --template *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments/*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments/*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments/* *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments/* *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments/* -q *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments/* --jq *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments/* -t *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/comments/* --template *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments/* -q *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments/* --jq *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments/* -t *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/comments/* --template *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api /repos/*/*/pull/files *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/issues/*/timeline *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/pulls*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/issues/*/comments*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/issues/*/timeline*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/commits*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/releases*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/branches*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/tags*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/contents*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/actions/runs*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api repos/*/*/workflows*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * -f *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * -f=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --raw-field *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --raw-field=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * -F *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * -F=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --field *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --field=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --input *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --input=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * -X *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * -X=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --method *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --method=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --verbose",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --verbose *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --header *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --header=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * -H *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * -H=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --hostname *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh api * --hostname=*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth token",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth token *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status --show-token",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status --show-token *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status * --show-token",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status * --show-token *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status -t",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status -t *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status * -t",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth status * -t *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth logout",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh auth logout *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo archive",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo archive *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo deploy-key delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh repo deploy-key delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh issue delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release delete-asset",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh release delete-asset *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh run delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh run delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project field-delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project field-delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project item-delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh project item-delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh ssh-key delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh ssh-key delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh gpg-key delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh gpg-key delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh secret delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh secret delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh gist delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh gist delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh cache delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh cache delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh codespace delete",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gh codespace delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl get *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl describe *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl logs *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker compose ps *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker compose logs *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker ps *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker logs *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker images *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker inspect *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker manifest inspect *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker build *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git status *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git diff *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git grep *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git log *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git show *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git show-ref *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git rev-parse *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git rev-list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git merge-tree *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git merge --ff-only origin/main",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git merge-base *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git ls-remote *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git ls-files *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git for-each-ref *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git check-ignore *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git blame *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch -vv",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch --show-current",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch --show-current *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch --list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch --list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch -r *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git fetch *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git remote -v",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git remote show *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git remote get-url *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git switch *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git stash *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag -l *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag --list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag -v *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag --verify *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag --short *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git path-id *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git worktree *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git push *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --force *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push -f *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --force-with-lease *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --mirror *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push -d *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --all *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --tags",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --tags *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git reset --hard",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git reset --hard *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git clean -fdx *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git clean -fxd *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git clean -dfx *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch -D *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag --sort *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git describe *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag -d *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag --delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag -f *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag --force *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git stash drop *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git stash clear *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git filter-branch *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git prune *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git credential *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git credential-cache *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git credential-store *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git update-ref *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git symbolic-ref *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git update-index *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git read-tree *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git add *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git commit *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git apply *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git checkout *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git worktree add *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "base64 -d",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "nl -ba",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "xargs *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "opencode --version",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "opencode models",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "cp *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "mv *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "mkdir *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "tee *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "npx *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "bunx *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "npm install *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "npm uninstall *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "npm publish *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "npm link *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "pnpm add *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "pnpm remove *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "pip install *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "pip uninstall *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker run *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker exec *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker rm *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker rmi *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker stop *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker kill *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker volume rm *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker network rm *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl apply *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl delete *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl exec *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl edit *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl patch *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl scale *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl cordon *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "helm *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "helm lint *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "helm show *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "helm version *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "helm template *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "helm dependency build *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "rm -r *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "rm *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "rmdir *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "chmod *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "chown *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "sudo *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "sudo chmod *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "sudo chown *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "sudo systemctl *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "sudo apt *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git clean -fd *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "docker system prune *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl drain *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "rm -rf *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "sudo rm *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "ansible-playbook",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "ansible-playbook --syntax-check *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "mise *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "mise ls *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "test *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "awk *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "true",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "command -v *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "golangci-lint *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx --help",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx help *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx help-tree *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx commands *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx version",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx version *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx providers list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config check",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config current-context",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config list-contexts *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config path *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config view",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config view -o json",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config view -o yaml",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx resources get *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx resources list-types *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx resources list-examples *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx resources validate *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx dashboards list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx dashboards search *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx dashboards get *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx dashboards list-versions *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx datasources list *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx datasources get *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx datasources health *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx datasources schemas *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx metrics labels *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx metrics metadata *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx metrics series *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx metrics query *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx logs labels *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx logs series *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx logs query *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx logs metrics *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx traces labels *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx traces query *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx traces get *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx traces metrics *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx profiles labels *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx profiles list-profile-types *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx profiles query *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx profiles metrics *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx profiles exemplars *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx login *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx cloud login *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config view *--raw*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config set *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config unset *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx config edit *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx * delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx cloud stacks delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx resources delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx dashboards delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx alert notification-policies reset *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gcx agent prune *",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "*.env",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*.env.*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*.key",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*.pem",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*.p12",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*.pfx",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*.secret",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*secret*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*token*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*credential*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*password*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*id_rsa*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*id_ed25519*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*kubeconfig*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": ".git/config",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*/credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*/.ssh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*/.gnupg/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*/secrets/**",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "glob",
+      "resource": "*.env",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*.env.*",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*.key",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*.pem",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*.p12",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*.pfx",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*.secret",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*secret*",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*token*",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*credential*",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*password*",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*/credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*/.ssh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*/.gnupg/**",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*/secrets/**",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "grep",
+      "resource": "*.env",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*.env.*",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*.key",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*.pem",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*.p12",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*.pfx",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*.secret",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*secret*",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*token*",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*credential*",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*password*",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*/credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*/.ssh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*/.gnupg/**",
+      "effect": "deny"
+    },
+    {
+      "action": "grep",
+      "resource": "*/secrets/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "edit",
+      "resource": "opencode/**",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "AGENTS.md",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "~/.config/opencode/**",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "*.env",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.env.*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.key",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.pem",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.p12",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.pfx",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.secret",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*secret*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*token*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*credential*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*password*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*/credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*/.ssh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*/secrets/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "edit",
+      "resource": "opencode/**",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "AGENTS.md",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "~/.config/opencode/**",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "*.env",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.env.*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.key",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.pem",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.p12",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.pfx",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.secret",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*secret*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*token*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*credential*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*password*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*/credentials/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*/.ssh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*/secrets/**",
+      "effect": "deny"
+    },
+    {
+      "action": "interactive_bash",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "mise_*",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "external_directory",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/tmp/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.config/opencode/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.agents/skills/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.cache/opencode/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.cache/oh-my-opencode/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.cache/oh-my-openagent/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/tmp/opencode/**",
+      "effect": "allow"
+    }
+  ]
 }

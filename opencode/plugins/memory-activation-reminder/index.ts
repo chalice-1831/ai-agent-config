@@ -1,4 +1,4 @@
-import type { Plugin } from "@opencode-ai/plugin";
+import { Plugin } from "@opencode/plugin";
 
 const ACTIVATION_SKILL = "memory-activation";
 
@@ -47,7 +47,10 @@ function toolNameFrom(input: Record<string, unknown>): string {
   return typeof tool === "string" ? tool : "";
 }
 
-export const MemoryActivationReminderPlugin: Plugin = async ({ client }) => {
+export const MemoryActivationReminderPlugin = Plugin.define({
+  id: "memory-activation-reminder",
+  async setup(ctx) {
+  const client = (ctx as any).client ?? ctx;
   const pendingBySession = new Map<string, PendingActivation>();
   let activeSessionId = "";
 
@@ -75,53 +78,57 @@ export const MemoryActivationReminderPlugin: Plugin = async ({ client }) => {
     pendingBySession.set(sessionID, { skill: skillName, injected: false, reminded: false });
   }
 
-  return {
-    event: async ({ event }) => {
+  const controller = new AbortController();
+  void (async () => {
+    for await (const event of client.event.subscribe({ signal: controller.signal })) {
       const { type, properties } = event as { type: string; properties: Record<string, unknown> };
       if (type === "session.created") {
         const info = properties.info as { id?: string } | undefined;
         if (info?.id) activeSessionId = info.id;
-        return;
+        continue;
       }
       if (type === "session.deleted") {
         const info = properties.info as { id?: string } | undefined;
         if (info?.id) pendingBySession.delete(info.id);
-        return;
+        continue;
       }
-      if (type !== "message.part.updated") return;
+      if (type !== "message.part.updated") continue;
 
       const part = properties.part as Record<string, unknown> | undefined;
-      if (!part || part.type !== "tool") return;
+      if (!part || part.type !== "tool") continue;
       const state = part.state as Record<string, unknown> | undefined;
-      if (state?.status !== "completed") return;
+      if (state?.status !== "completed") continue;
       const sessionID = sessionIdFrom(properties, part) || activeSessionId;
-      if (!sessionID) return;
+      if (!sessionID) continue;
       const toolName = typeof part.tool === "string" ? part.tool : "";
-      if (toolName !== "skill") return;
+      if (toolName !== "skill") continue;
       handleSkill(sessionID, extractSkillName(state.input));
-    },
+    }
+  })();
 
-    "tool.execute.before": async (input) => {
-      const sessionID = typeof input.sessionID === "string" ? input.sessionID : activeSessionId;
+  await client.tool.hook("execute.before", async (event: any) => {
+      const sessionID = typeof event.sessionID === "string" ? event.sessionID : activeSessionId;
       if (!sessionID) return;
       const pending = pendingBySession.get(sessionID);
       if (!pending || pending.reminded) return;
-      const toolName = toolNameFrom(input as Record<string, unknown>);
+      const toolName = typeof event.tool === "string" ? event.tool : "";
       if (NON_ACTION_TOOLS.has(toolName)) return;
       await remind(sessionID, pending);
-    },
+  });
 
-    "experimental.chat.system.transform": async (input, output) => {
-      const sessionID = input.sessionID || activeSessionId;
-      if (!sessionID || !Array.isArray(output.system)) return;
+  await client.session.hook("context", async (event: any) => {
+      const sessionID = event.sessionID || activeSessionId;
+      if (!sessionID || !Array.isArray(event.system)) return;
       const pending = pendingBySession.get(sessionID);
       if (!pending || pending.injected) return;
       pending.injected = true;
-      output.system.push(
+      event.system.push({ type: "text", text:
         `[Memory activation reminder]\nYou loaded task-specific/action skill "${pending.skill}" but have not applied memory-activation yet. Before acting, load/apply memory-activation, or explicitly state why it is skipped for this task.`
-      );
-    },
-  };
-};
+      });
+  });
+
+  return () => controller.abort();
+  },
+});
 
 export default MemoryActivationReminderPlugin;

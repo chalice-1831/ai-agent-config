@@ -1,4 +1,4 @@
-import type { Plugin } from "@opencode-ai/plugin";
+import { Plugin } from "@opencode/plugin";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -19,7 +19,10 @@ function sessionIdFrom(input: { sessionID?: unknown }, activeSessionID: string):
   return typeof input.sessionID === "string" && input.sessionID ? input.sessionID : activeSessionID;
 }
 
-export const AgentsMDReminderPlugin: Plugin = async ({ client }) => {
+export const AgentsMDReminderPlugin = Plugin.define({
+  id: "agents-md-reminder",
+  async setup(ctx) {
+  const client = (ctx as any).client ?? ctx;
   const sessions = new Map<string, SessionState>();
   let activeSessionID = "";
   const hasGlobalAgents = existsSync(GLOBAL_AGENTS_PATH);
@@ -39,8 +42,9 @@ export const AgentsMDReminderPlugin: Plugin = async ({ client }) => {
     } catch {}
   }
 
-  return {
-    event: async ({ event }) => {
+  const controller = new AbortController();
+  void (async () => {
+    for await (const event of client.event.subscribe({ signal: controller.signal })) {
       const properties = (event as { properties?: Record<string, unknown> }).properties ?? {};
       if (event.type === "session.created") {
         const info = properties.info as Record<string, unknown> | undefined;
@@ -49,17 +53,17 @@ export const AgentsMDReminderPlugin: Plugin = async ({ client }) => {
           activeSessionID = sessionID;
           sessions.set(sessionID, { callsSinceReminder: 0, compactionInProgress: false, remindAfterCompaction: false, missingRuleLogged: false });
         }
-        return;
+        continue;
       }
 
       if (event.type === "session.compacted") {
         const sessionID = typeof properties.sessionID === "string" ? properties.sessionID : activeSessionID;
-        if (!sessionID) return;
+        if (!sessionID) continue;
         const state = sessions.get(sessionID) ?? { callsSinceReminder: 0, compactionInProgress: false, remindAfterCompaction: false, missingRuleLogged: false };
         state.compactionInProgress = false;
         state.remindAfterCompaction = true;
         sessions.set(sessionID, state);
-        return;
+        continue;
       }
 
       if (event.type === "session.deleted") {
@@ -67,11 +71,12 @@ export const AgentsMDReminderPlugin: Plugin = async ({ client }) => {
         const sessionID = typeof info?.id === "string" ? info.id : properties.sessionID;
         if (typeof sessionID === "string") sessions.delete(sessionID);
       }
-    },
+    }
+  })();
 
-    "experimental.chat.system.transform": async (input, output) => {
-      if (!Array.isArray(output.system)) return;
-      const sessionID = sessionIdFrom(input, activeSessionID);
+  await client.session.hook("context", async (event: any) => {
+      if (!Array.isArray(event.system)) return;
+      const sessionID = sessionIdFrom(event, activeSessionID);
       if (!sessionID) return;
 
       const state = sessions.get(sessionID) ?? { callsSinceReminder: 0, compactionInProgress: false, remindAfterCompaction: false, missingRuleLogged: false };
@@ -100,21 +105,23 @@ export const AgentsMDReminderPlugin: Plugin = async ({ client }) => {
         return;
       }
 
-      output.system.push(`[AGENTS.md reminder]\n${REMINDER}`);
+      event.system.push({ type: "text", text: `[AGENTS.md reminder]\n${REMINDER}` });
       const trigger = afterCompaction ? "after_compaction" : "periodic";
       state.callsSinceReminder = 0;
       sessions.set(sessionID, state);
       await log(sessionID, trigger, 0);
-    },
+  });
 
-    "experimental.session.compacting": async (input) => {
-      const sessionID = sessionIdFrom(input, activeSessionID);
+  await client.session.hook("compaction", async (event: any) => {
+      const sessionID = sessionIdFrom(event, activeSessionID);
       if (!sessionID) return;
       const state = sessions.get(sessionID) ?? { callsSinceReminder: 0, compactionInProgress: false, remindAfterCompaction: false, missingRuleLogged: false };
       state.compactionInProgress = true;
       sessions.set(sessionID, state);
-    },
-  };
-};
+  });
+
+  return () => controller.abort();
+  },
+});
 
 export default AgentsMDReminderPlugin;

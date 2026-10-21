@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SOURCE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="${TARGET_DIR:-$HOME/.config/opencode}"
+TARGET_DIR="${TARGET_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/opencode}"
 [[ "${TARGET_DIR}" = /* ]] || TARGET_DIR="${PWD}/${TARGET_DIR}"
 EXTRA_FILES_VALUE="${EXTRA_FILES:-}"
 BACKUP_DIR=""
@@ -32,7 +32,7 @@ list_link_pairs() {
 			printf '%s\t%s\n' "${f}" "${TARGET_DIR}/$(basename "${f}")"
 		done
 
-		local opencode_subdirs=("plugins" "commands")
+		local opencode_subdirs=("commands")
 		local subdir
 		for subdir in "${opencode_subdirs[@]}"; do
 			if [[ -d "${opencode_dir}/${subdir}" ]]; then
@@ -42,6 +42,13 @@ list_link_pairs() {
 				done < <(find "${opencode_dir}/${subdir}" -type f -print0)
 			fi
 		done
+
+		if [[ -d "${opencode_dir}/plugins" ]]; then
+			while IFS= read -r -d '' f; do
+				local rel_path="${f#${opencode_dir}/}"
+				printf '%s\t%s\n' "${f}" "${TARGET_DIR}/${rel_path}"
+			done < <(find "${opencode_dir}/plugins" -mindepth 1 -maxdepth 1 -type d -print0)
+		fi
 	fi
 }
 
@@ -57,6 +64,8 @@ backup_file() {
 	mkdir -p -- "${BACKUP_DIR}/$(dirname -- "${relative}")"
 	if [[ -L "${target}" && ! -e "${target}" ]]; then
 		cp -P -- "${target}" "${BACKUP_DIR}/${relative}"
+	elif [[ -d "${target}" && ! -L "${target}" ]]; then
+		cp -a -- "${target}" "${BACKUP_DIR}/${relative}"
 	else
 		cp -pL -- "${target}" "${BACKUP_DIR}/${relative}"
 	fi
@@ -65,7 +74,7 @@ backup_file() {
 preflight_links() {
 	local src target
 	while IFS=$'\t' read -r src target; do
-		if [[ ! -f "${src}" || -d "${target}" ]]; then
+		if [[ ! -e "${src}" || (-d "${target}" && ! -d "${src}") ]]; then
 			echo "[ERROR] Missing source or directory at file target: ${src} -> ${target}" >&2
 			return 2
 		fi
@@ -166,7 +175,7 @@ Commands:
   backup    Placeholder command (not implemented)
 
 Environment variables:
-  TARGET_DIR   Default: ~/.config/opencode; relative paths use the current directory
+  TARGET_DIR   Default: ${XDG_CONFIG_HOME:-$HOME/.config}/opencode; relative paths use the current directory
   EXTRA_FILES  Optional space-separated extra files to link
 EOF
 }

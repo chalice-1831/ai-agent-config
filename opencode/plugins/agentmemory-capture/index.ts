@@ -1,4 +1,4 @@
-import type { Plugin } from "@opencode-ai/plugin";
+import { Plugin } from "@opencode/plugin";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -16,7 +16,8 @@ const SESSION_END_COMMAND = "session-end";
 const DEBUG = process.env.OPENCODE_AGENTMEMORY_DEBUG === "1";
 function usableSecret(value: unknown): string {
   const trimmed = typeof value === "string" ? value.trim() : "";
-  if (!trimmed || (trimmed.startsWith("${") && trimmed.endsWith("}"))) return "";
+  if (!trimmed || (trimmed.startsWith("${") && trimmed.endsWith("}")))
+    return "";
   return trimmed;
 }
 
@@ -35,7 +36,13 @@ function envFileSecret(): string {
     if (trimmed.startsWith("#")) continue;
     const eq = trimmed.indexOf("=");
     if (eq === -1) continue;
-    if (trimmed.slice(0, eq).replace(/^export\s+/, "").trim() !== "AGENTMEMORY_SECRET") continue;
+    if (
+      trimmed
+        .slice(0, eq)
+        .replace(/^export\s+/, "")
+        .trim() !== "AGENTMEMORY_SECRET"
+    )
+      continue;
     let value = trimmed.slice(eq + 1).trim();
     const quote = value[0];
     const close = quote === '"' || quote === "'" ? value.indexOf(quote, 1) : -1;
@@ -49,7 +56,11 @@ function envFileSecret(): string {
 function isLoopbackUrl(url: string): boolean {
   try {
     const host = new URL(url).hostname.replace(/^\[|\]$/g, "").toLowerCase();
-    return host === "localhost" || host === "::1" || /^127(?:\.\d{1,3}){3}$/.test(host);
+    return (
+      host === "localhost" ||
+      host === "::1" ||
+      /^127(?:\.\d{1,3}){3}$/.test(host)
+    );
   } catch {
     return false;
   }
@@ -65,12 +76,18 @@ function resolveSecret(url: string, explicit: string | undefined): string {
 const SECRET = resolveSecret(API, process.env.AGENTMEMORY_SECRET);
 
 function authHeaders(): Record<string, string> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
   if (SECRET) headers["Authorization"] = `Bearer ${SECRET}`;
   return headers;
 }
 
-async function post(path: string, body: Record<string, unknown>, timeoutMs = 5000): Promise<void> {
+async function post(
+  path: string,
+  body: Record<string, unknown>,
+  timeoutMs = 5000,
+): Promise<void> {
   try {
     await fetch(`${API}/agentmemory${path}`, {
       method: "POST",
@@ -79,11 +96,15 @@ async function post(path: string, body: Record<string, unknown>, timeoutMs = 500
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (e) {
-    if (DEBUG) console.error(`[agentmemory] POST ${path} failed:`, (e as Error).message);
+    if (DEBUG)
+      console.error(`[agentmemory] POST ${path} failed:`, (e as Error).message);
   }
 }
 
-async function postJson(path: string, body: Record<string, unknown>): Promise<unknown | null> {
+async function postJson(
+  path: string,
+  body: Record<string, unknown>,
+): Promise<unknown | null> {
   try {
     const res = await fetch(`${API}/agentmemory${path}`, {
       method: "POST",
@@ -93,7 +114,8 @@ async function postJson(path: string, body: Record<string, unknown>): Promise<un
     });
     return res.ok ? await res.json() : null;
   } catch (e) {
-    if (DEBUG) console.error(`[agentmemory] POST ${path} failed:`, (e as Error).message);
+    if (DEBUG)
+      console.error(`[agentmemory] POST ${path} failed:`, (e as Error).message);
     return null;
   }
 }
@@ -128,9 +150,23 @@ let defaultProjectName: string | null = null;
 let defaultProjectCwd: string | null = null;
 const sessionProjects = new Map<string, { name: string; cwd: string }>();
 
-function projectFor(sessionId: string): { name: string | null; cwd: string | null } {
+function projectFor(sessionId: string): {
+  name: string | null;
+  cwd: string | null;
+} {
   const p = sessionProjects.get(sessionId);
   return p ?? { name: defaultProjectName, cwd: defaultProjectCwd };
+}
+
+function locationDirectory(value: unknown): string {
+  if (typeof value === "string" && value.length > 0) return value;
+  if (!value || typeof value !== "object") return "";
+  const record = value as Record<string, unknown>;
+  for (const key of ["path", "directory", "cwd"]) {
+    if (typeof record[key] === "string" && record[key])
+      return record[key] as string;
+  }
+  return "";
 }
 
 const projectNameCache = new Map<string, string>();
@@ -188,31 +224,46 @@ const startContextCache = new Map<string, string>();
 
 function stashFor(sid: string): Set<string> {
   let s = stashedFiles.get(sid);
-  if (!s) { s = new Set<string>(); stashedFiles.set(sid, s); }
+  if (!s) {
+    s = new Set<string>();
+    stashedFiles.set(sid, s);
+  }
   return s;
 }
 
 function subtaskSetFor(sid: string): Set<string> {
   let s = seenSubtaskIds.get(sid);
-  if (!s) { s = new Set<string>(); seenSubtaskIds.set(sid, s); }
+  if (!s) {
+    s = new Set<string>();
+    seenSubtaskIds.set(sid, s);
+  }
   return s;
 }
 
 function toolCallSetFor(sid: string): Set<string> {
   let s = seenToolCallIds.get(sid);
-  if (!s) { s = new Set<string>(); seenToolCallIds.set(sid, s); }
+  if (!s) {
+    s = new Set<string>();
+    seenToolCallIds.set(sid, s);
+  }
   return s;
 }
 
 function permissionRequestMapFor(sid: string): Map<string, PermissionRequest> {
   let s = permissionRequests.get(sid);
-  if (!s) { s = new Map<string, PermissionRequest>(); permissionRequests.set(sid, s); }
+  if (!s) {
+    s = new Map<string, PermissionRequest>();
+    permissionRequests.set(sid, s);
+  }
   return s;
 }
 
 function messageContextMapFor(sid: string): Map<string, MessageContext> {
   let s = messageContexts.get(sid);
-  if (!s) { s = new Map<string, MessageContext>(); messageContexts.set(sid, s); }
+  if (!s) {
+    s = new Map<string, MessageContext>();
+    messageContexts.set(sid, s);
+  }
   return s;
 }
 
@@ -228,17 +279,31 @@ function pruneSessionMaps(sid: string): void {
 function safeSlice(v: unknown, max: number): string {
   if (typeof v === "string") return v.slice(0, max);
   if (v == null) return "";
-  try { return JSON.stringify(v).slice(0, max); } catch { return ""; }
+  try {
+    return JSON.stringify(v).slice(0, max);
+  } catch {
+    return "";
+  }
 }
 
-function hasEmptyMemorySearchResult(toolName: string, output: unknown): boolean {
+function hasEmptyMemorySearchResult(
+  toolName: string,
+  output: unknown,
+): boolean {
   const searchTools = ["recall", "search", "patterns", "sessions", "history"];
-  if (!toolName.startsWith("agentmemory_memory_") || !searchTools.some((name) => toolName.includes(name))) {
+  if (
+    !toolName.startsWith("agentmemory_memory_") ||
+    !searchTools.some((name) => toolName.includes(name))
+  ) {
     return false;
   }
   let value = output;
   if (typeof value === "string") {
-    try { value = JSON.parse(value); } catch { return false; }
+    try {
+      value = JSON.parse(value);
+    } catch {
+      return false;
+    }
   }
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const result = value as Record<string, unknown>;
@@ -306,29 +371,39 @@ function extractErrorMessage(err: unknown): string {
       if (typeof d.message === "string") return d.message;
     }
     if (typeof e.name === "string") return e.name;
-    try { return JSON.stringify(err); } catch { return ""; }
+    try {
+      return JSON.stringify(err);
+    } catch {
+      return "";
+    }
   }
   return String(err ?? "");
 }
 
-export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
-  defaultProjectCwd = ctx.worktree || ctx.project?.id || process.cwd();
-  defaultProjectName = resolveProjectName(defaultProjectCwd);
+export const AgentmemoryCapturePlugin = Plugin.define({
+  id: "agentmemory-capture",
+  async setup(ctx) {
+    const location = (ctx as any).location ?? {};
+    const client = (ctx as any).client ?? ctx;
+    defaultProjectCwd =
+      locationDirectory((ctx as any).worktree) ||
+      locationDirectory(location.directory) ||
+      process.cwd();
+    defaultProjectName = resolveProjectName(defaultProjectCwd);
 
-  async function endSession(sid: string): Promise<void> {
-    if (endedSessions.has(sid)) return;
-    endedSessions.add(sid);
-    await post("/session/end", { sessionId: sid });
-    post("/crystals/auto", { olderThanDays: 7 }, 30000);
-    post("/consolidate-pipeline", { tier: "all", force: true }, 30000);
-    if (sid === activeSessionId) activeSessionId = null;
-    pruneSessionMaps(sid);
-    startContextCache.delete(sid);
-    contextInjectedSessions.delete(sid);
-  }
+    async function endSession(sid: string): Promise<void> {
+      if (endedSessions.has(sid)) return;
+      endedSessions.add(sid);
+      await post("/session/end", { sessionId: sid });
+      post("/crystals/auto", { olderThanDays: 7 }, 30000);
+      post("/consolidate-pipeline", { tier: "all", force: true }, 30000);
+      if (sid === activeSessionId) activeSessionId = null;
+      pruneSessionMaps(sid);
+      startContextCache.delete(sid);
+      contextInjectedSessions.delete(sid);
+    }
 
-  return {
-    event: async ({ event }) => {
+    const eventHandler = async (event: any) => {
       const type = event.type;
       const props = (event as any).properties || {};
 
@@ -354,7 +429,10 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
             : defaultProjectCwd;
         let proj: { name: string | null; cwd: string | null };
         if (sessionDir) {
-          const entry = { cwd: sessionDir, name: resolveProjectName(sessionDir) };
+          const entry = {
+            cwd: sessionDir,
+            name: resolveProjectName(sessionDir),
+          };
           sessionProjects.set(sessionId, entry);
           proj = entry;
         } else {
@@ -412,11 +490,17 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         const sid = props.sessionID || activeSessionId;
         if (!sid || !Array.isArray(props.diff)) return;
         const diffs = props.diff as Array<Record<string, unknown>>;
-        const additions = diffs.reduce((s, d) => s + ((d.additions as number) || 0), 0);
-        const deletions = diffs.reduce((s, d) => s + ((d.deletions as number) || 0), 0);
+        const additions = diffs.reduce(
+          (s, d) => s + ((d.additions as number) || 0),
+          0,
+        );
+        const deletions = diffs.reduce(
+          (s, d) => s + ((d.deletions as number) || 0),
+          0,
+        );
         if (diffs.length === 0 || (additions === 0 && deletions === 0)) return;
         await observe(sid, "session_diff", {
-          files: diffs.map(d => d.file),
+          files: diffs.map((d) => d.file),
           additions,
           deletions,
           diffs: diffs.slice(0, 50),
@@ -427,7 +511,8 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "session.deleted") {
         const sid = props.info?.id || props.sessionID || activeSessionId;
         if (!sid) {
-          if (DEBUG) console.error("[agentmemory] session.deleted with no session ID");
+          if (DEBUG)
+            console.error("[agentmemory] session.deleted with no session ID");
           return;
         }
         await endSession(sid);
@@ -449,7 +534,8 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "message.updated") {
         const info = props.info as Record<string, unknown> | undefined;
         if (!info) return;
-        const sid = props.sessionID || (info.sessionID as string) || activeSessionId;
+        const sid =
+          props.sessionID || (info.sessionID as string) || activeSessionId;
         if (!sid) return;
         if (typeof info.id === "string" && info.id.length > 0) {
           messageContextMapFor(sid).set(info.id, {
@@ -483,9 +569,11 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
             },
             finish: info.finish ?? null,
             error,
-            duration_ms: (info.time && typeof (info.time as any).completed === "number")
-              ? (info.time as any).completed - ((info.time as any).created || 0)
-              : null,
+            duration_ms:
+              info.time && typeof (info.time as any).completed === "number"
+                ? (info.time as any).completed -
+                  ((info.time as any).created || 0)
+                : null,
           });
         }
       }
@@ -494,12 +582,15 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "message.removed") {
         const sid = props.sessionID || activeSessionId;
         if (!sid) return;
-        const messageID = typeof props.messageID === "string"
-          ? props.messageID
-          : typeof props.id === "string"
-            ? props.id
-            : "";
-        const messageContext = messageID ? messageContexts.get(sid)?.get(messageID) : undefined;
+        const messageID =
+          typeof props.messageID === "string"
+            ? props.messageID
+            : typeof props.id === "string"
+              ? props.id
+              : "";
+        const messageContext = messageID
+          ? messageContexts.get(sid)?.get(messageID)
+          : undefined;
         if (!messageContext) return;
         messageContexts.get(sid)?.delete(messageID);
         await observe(sid, "message_removed", {
@@ -518,7 +609,8 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "message.part.updated") {
         const part = props.part as Record<string, unknown> | undefined;
         if (!part) return;
-        const sid = (part.sessionID as string) || props.sessionID || activeSessionId;
+        const sid =
+          (part.sessionID as string) || props.sessionID || activeSessionId;
         if (!sid) return;
 
         if (part.type === "subtask") {
@@ -550,8 +642,10 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
             const st = state as Record<string, unknown>;
             if (hasEmptyMemorySearchResult(toolName, st.output)) return;
             const rawTime = (st.time as any) || {};
-            const startTime = typeof rawTime.start === "number" ? rawTime.start : null;
-            const endTime = typeof rawTime.end === "number" ? rawTime.end : null;
+            const startTime =
+              typeof rawTime.start === "number" ? rawTime.start : null;
+            const endTime =
+              typeof rawTime.end === "number" ? rawTime.end : null;
             await observe(sid, "post_tool_use", {
               tool_name: toolName,
               call_id: callId,
@@ -559,9 +653,14 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
               tool_output: safeSlice(st.output, 8000),
               title: st.title ?? null,
               metadata: st.metadata || {},
-              duration_ms: (startTime != null && endTime != null) ? endTime - startTime : null,
+              duration_ms:
+                startTime != null && endTime != null
+                  ? endTime - startTime
+                  : null,
               attachments: Array.isArray(st.attachments)
-                ? (st.attachments as Array<Record<string, unknown>>).map(a => a.filename || a.url)
+                ? (st.attachments as Array<Record<string, unknown>>).map(
+                    (a) => a.filename || a.url,
+                  )
                 : [],
             });
           } else if (state.status === "error") {
@@ -570,14 +669,19 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
             callSet.add(callId);
             const st = state as Record<string, unknown>;
             const rawTime = (st.time as any) || {};
-            const startTime = typeof rawTime.start === "number" ? rawTime.start : null;
-            const endTime = typeof rawTime.end === "number" ? rawTime.end : null;
+            const startTime =
+              typeof rawTime.start === "number" ? rawTime.start : null;
+            const endTime =
+              typeof rawTime.end === "number" ? rawTime.end : null;
             await observe(sid, "post_tool_failure", {
               tool_name: toolName,
               call_id: callId,
               tool_input: safeSlice(st.input, 4000),
               tool_output: safeSlice(st.error, 8000),
-              duration_ms: (startTime != null && endTime != null) ? endTime - startTime : null,
+              duration_ms:
+                startTime != null && endTime != null
+                  ? endTime - startTime
+                  : null,
             });
           }
           return;
@@ -650,16 +754,18 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "permission.asked") {
         const sid = props.sessionID || activeSessionId;
         if (!sid) return;
-        const permissionID = typeof props.id === "string"
-          ? props.id
-          : typeof props.permissionID === "string"
-            ? props.permissionID
-            : "";
-        const permission = typeof props.permission === "string"
-          ? props.permission
-          : typeof props.type === "string"
-            ? props.type
-            : "unknown";
+        const permissionID =
+          typeof props.id === "string"
+            ? props.id
+            : typeof props.permissionID === "string"
+              ? props.permissionID
+              : "";
+        const permission =
+          typeof props.permission === "string"
+            ? props.permission
+            : typeof props.type === "string"
+              ? props.type
+              : "unknown";
         const patterns = Array.isArray(props.patterns)
           ? props.patterns.filter((p): p is string => typeof p === "string")
           : Array.isArray(props.pattern)
@@ -667,13 +773,20 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
             : typeof props.pattern === "string"
               ? [props.pattern]
               : [];
-        const toolCallId = typeof props.callID === "string" ? props.callID : null;
-        const title = typeof props.title === "string" && props.title.length > 0
-          ? props.title
-          : permission;
+        const toolCallId =
+          typeof props.callID === "string" ? props.callID : null;
+        const title =
+          typeof props.title === "string" && props.title.length > 0
+            ? props.title
+            : permission;
 
         if (permissionID) {
-          permissionRequestMapFor(sid).set(permissionID, { permission, patterns, title, toolCallId });
+          permissionRequestMapFor(sid).set(permissionID, {
+            permission,
+            patterns,
+            title,
+            toolCallId,
+          });
         }
         await observe(sid, "notification", {
           notification_type: "permission_prompt",
@@ -694,7 +807,7 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
           permission: props.type || "unknown",
           pattern: Array.isArray(props.pattern)
             ? props.pattern.join(", ")
-            : (props.pattern || ""),
+            : props.pattern || "",
           tool_call_id: props.callID || null,
           title: props.title || props.type || "",
         });
@@ -704,12 +817,15 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       if (type === "permission.replied") {
         const sid = props.sessionID || activeSessionId;
         if (!sid) return;
-        const permissionID = typeof props.permissionID === "string"
-          ? props.permissionID
-          : typeof props.requestID === "string"
-            ? props.requestID
-            : "";
-        const request = permissionID ? permissionRequests.get(sid)?.get(permissionID) : undefined;
+        const permissionID =
+          typeof props.permissionID === "string"
+            ? props.permissionID
+            : typeof props.requestID === "string"
+              ? props.requestID
+              : "";
+        const request = permissionID
+          ? permissionRequests.get(sid)?.get(permissionID)
+          : undefined;
         if (!request) return;
         permissionRequests.get(sid)?.delete(permissionID);
         await observe(sid, "permission_replied", {
@@ -726,13 +842,21 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       // ── todo.updated ──
       if (type === "todo.updated") {
         const sid = props.sessionID || activeSessionId;
-        const todos = Array.isArray(props.todos) ? props.todos.slice(0, 100) : [];
+        const todos = Array.isArray(props.todos)
+          ? props.todos.slice(0, 100)
+          : [];
         if (!sid || todos.length === 0) return;
         const completed = todos.filter((t: any) => t.status === "completed");
         const active = todos.filter((t: any) => t.status !== "completed");
         await observe(sid, "task_completed", {
-          completed: completed.map((t: any) => ({ content: t.content, priority: t.priority })),
-          in_progress: active.map((t: any) => ({ content: t.content, priority: t.priority })),
+          completed: completed.map((t: any) => ({
+            content: t.content,
+            priority: t.priority,
+          })),
+          in_progress: active.map((t: any) => ({
+            content: t.content,
+            priority: t.priority,
+          })),
           total: todos.length,
         });
       }
@@ -740,7 +864,10 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       // ── command.executed ──
       if (type === "command.executed") {
         const sid = props.sessionID || activeSessionId;
-        if (sid && String(props.name ?? "").replace(/^\//, "") === SESSION_END_COMMAND) {
+        if (
+          sid &&
+          String(props.name ?? "").replace(/^\//, "") === SESSION_END_COMMAND
+        ) {
           await endSession(sid);
         } else if (sid) {
           await observe(sid, "command_executed", {
@@ -749,17 +876,18 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
           });
         }
       }
-    },
+    };
 
     // ── chat.message ──
-    "chat.message": async (input, output) => {
-      const sid = input.sessionID || activeSessionId;
+    await ctx.session.hook("prompt", async (event: any) => {
+      const sid = event.sessionID || activeSessionId;
       if (!sid) return;
-      const parts = output.parts || [];
-      const files = parts
-        .filter((p: any) => p.type === "file")
-        .map((p: any) => p.filename || p.url)
-        .filter(Boolean);
+      const prompt = event.prompt ?? {};
+      const files = Array.isArray(prompt.files)
+        ? prompt.files
+            .map((file: any) => file.uri || file.filename || file.url)
+            .filter(Boolean)
+        : [];
       for (const f of files) {
         const stash = stashFor(sid);
         stash.add(f);
@@ -770,32 +898,23 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         }
       }
 
-      const textParts = parts.filter((p: any) => p.type === "text" && !p.synthetic && !p.ignored);
-      const userText = textParts.map((p: any) => p.text || "").join("\n");
-
       await observe(sid, "prompt_submit", {
-        agent: input.agent ?? null,
-        model: input.model ?? null,
-        variant: input.variant ?? null,
-        prompt: userText.slice(0, 8000),
+        agent: event.agent ?? null,
+        model: event.model ?? null,
+        variant: event.variant ?? null,
+        prompt:
+          typeof prompt.text === "string" ? prompt.text.slice(0, 8000) : "",
         files: files.slice(0, 20),
-        parts_summary: parts.map((p: any) => p.type).filter(Boolean),
+        parts_summary: ["text", ...files.map(() => "file")],
       });
-    },
-
-    // ── chat.params ──
-    "chat.params": async (input, output) => {
-      if (!input.model || !output) return;
-      const sid = input.sessionID || activeSessionId;
-      if (!sid) return;
-    },
+    });
 
     // ── tool.execute.before ──
-    "tool.execute.before": async (input, output) => {
-      if (!FILE_TOOLS.has(String(input.tool ?? "").toLowerCase())) return;
-      const sid = input.sessionID || activeSessionId;
+    await ctx.tool.hook("execute.before", async (event: any) => {
+      if (!FILE_TOOLS.has(String(event.tool ?? "").toLowerCase())) return;
+      const sid = event.sessionID || activeSessionId;
       if (!sid) return;
-      const args = output.args as Record<string, unknown> | undefined;
+      const args = event.input as Record<string, unknown> | undefined;
       if (!args) return;
       const stash = stashFor(sid);
       for (const fp of extractFilePaths(args)) {
@@ -806,16 +925,16 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
         stash.clear();
         for (const f of keep) stash.add(f);
       }
-    },
+    });
 
     // ── experimental.chat.system.transform ──
-    "experimental.chat.system.transform": async (input, output) => {
-      const sid = input.sessionID || activeSessionId;
+    await ctx.session.hook("context", async (event: any) => {
+      const sid = event.sessionID || activeSessionId;
       if (!sid || endedSessions.has(sid)) return;
 
       if (!contextInjectedSessions.has(sid)) {
-        if (!Array.isArray(output.system)) return;
-        output.system.push(AGENTMEMORY_INSTRUCTIONS);
+        if (!Array.isArray(event.system)) return;
+        event.system.push({ type: "text", text: AGENTMEMORY_INSTRUCTIONS });
         // prefer the context already fetched at session.created;
         // fall back to a fresh /context call if the cache missed (e.g.
         // session resumed across plugin reloads).
@@ -830,7 +949,7 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
           startContextCache.delete(sid);
         }
         if (typeof ctx === "string" && ctx.length > 0) {
-          output.system.push(ctx);
+          event.system.push({ type: "text", text: ctx });
         }
         contextInjectedSessions.add(sid);
       }
@@ -847,16 +966,16 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
 
       const enrichCtx = (enrichResult as any)?.context;
       if (typeof enrichCtx === "string" && enrichCtx.length > 0) {
-        if (Array.isArray(output.system)) {
-          output.system.push(enrichCtx);
+        if (Array.isArray(event.system)) {
+          event.system.push({ type: "text", text: enrichCtx });
         }
         for (const f of files) stash.delete(f);
       }
-    },
+    });
 
     // ── experimental.session.compacting (WIP) ──
-    "experimental.session.compacting": async (input, output) => {
-      const sid = input.sessionID || activeSessionId;
+    await ctx.session.hook("compaction", async (event: any) => {
+      const sid = event.sessionID || activeSessionId;
       if (!sid || endedSessions.has(sid)) return;
 
       const result = await postJson("/context", {
@@ -865,27 +984,42 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       });
       const ctx = (result as any)?.context;
       if (typeof ctx === "string" && ctx.length > 0) {
-        if (Array.isArray(output.context)) {
-          output.context.push(ctx);
+        if (Array.isArray(event.system)) {
+          event.system.push({ type: "text", text: ctx });
         }
       }
-    },
+    });
 
     // ── config ──
-    config: async (input) => {
+    const configHandler = async (input: any) => {
       const payload: Record<string, unknown> = {
         theme: input.theme ?? null,
         model: input.model ?? null,
         autoupdate: input.autoupdate ?? null,
-        agents: typeof input.agent === "object" && input.agent !== null && !Array.isArray(input.agent)
-          ? Object.keys(input.agent as Record<string, unknown>)
-          : Array.isArray(input.agent) ? input.agent : [],
-        mcp_servers: typeof input.mcp === "object" && input.mcp !== null && !Array.isArray(input.mcp)
-          ? Object.keys(input.mcp as Record<string, unknown>)
-          : Array.isArray(input.mcp) ? input.mcp : [],
-        providers: typeof input.provider === "object" && input.provider !== null && !Array.isArray(input.provider)
-          ? Object.keys(input.provider as Record<string, unknown>)
-          : Array.isArray(input.provider) ? input.provider : [],
+        agents:
+          typeof input.agent === "object" &&
+          input.agent !== null &&
+          !Array.isArray(input.agent)
+            ? Object.keys(input.agent as Record<string, unknown>)
+            : Array.isArray(input.agent)
+              ? input.agent
+              : [],
+        mcp_servers:
+          typeof input.mcp === "object" &&
+          input.mcp !== null &&
+          !Array.isArray(input.mcp)
+            ? Object.keys(input.mcp as Record<string, unknown>)
+            : Array.isArray(input.mcp)
+              ? input.mcp
+              : [],
+        providers:
+          typeof input.provider === "object" &&
+          input.provider !== null &&
+          !Array.isArray(input.provider)
+            ? Object.keys(input.provider as Record<string, unknown>)
+            : Array.isArray(input.provider)
+              ? input.provider
+              : [],
         permission: input.permission ?? null,
       };
       if (activeSessionId) {
@@ -893,6 +1027,19 @@ export const AgentmemoryCapturePlugin: Plugin = async (ctx) => {
       } else {
         pendingConfig = payload;
       }
-    },
-  };
-};
+    };
+
+    const controller = new AbortController();
+    void (async () => {
+      for await (const event of client.event.subscribe({
+        signal: controller.signal,
+      })) {
+        await eventHandler(event);
+      }
+    })();
+    await configHandler((ctx as any).config ?? {});
+    return () => controller.abort();
+  },
+});
+
+export default AgentmemoryCapturePlugin;

@@ -1,32 +1,57 @@
 import { expect, test } from "bun:test";
 import { AgentsMDReminderPlugin } from "../opencode/plugins/agents-md-reminder/index";
 
-function clientFor(logs: any[]) {
+function contextFor(logs: any[]) {
+  const events: any[] = [];
+  const waiters: Array<(result: IteratorResult<any>) => void> = [];
+  const hooks = new Map<string, (event: any) => Promise<void> | void>();
   return {
-    app: {
-      log: async ({ body }: { body: any }) => {
-        logs.push(body);
-        return {};
+    context: {
+      event: { subscribe: async function* () {
+        while (true) {
+          const event = events.shift() ?? await new Promise<any>((resolve) => waiters.push(resolve));
+          yield event;
+        }
+      } },
+      session: { hook: async (name: string, callback: any) => hooks.set(name, callback) },
+      app: {
+        log: async ({ body }: { body: any }) => {
+          logs.push(body);
+          return {};
+        },
       },
+    },
+    hooks,
+    emit(event: any) {
+      const waiter = waiters.shift();
+      if (waiter) waiter({ value: event, done: false });
+      else events.push(event);
     },
   };
 }
 
-async function call(plugin: any, sessionID: string, output: { system: string[] }) {
-  await plugin["experimental.chat.system.transform"]?.({ sessionID }, output);
+async function setup(logs: any[]) {
+  const harness = contextFor(logs);
+  await (AgentsMDReminderPlugin as any).setup(harness.context);
+  return harness;
+}
+
+async function call(plugin: any, sessionID: string, output: { system: any[] }) {
+  await plugin.hooks.get("context")?.({ sessionID, system: output.system });
 }
 
 test("reminds on the tenth normal model call and resets the interval", async () => {
   const logs: any[] = [];
-  const plugin = await AgentsMDReminderPlugin({ client: clientFor(logs) } as any);
-  await plugin.event?.({ event: { type: "session.created", properties: { info: { id: "session-1" } } } } as any);
+  const plugin = await setup(logs);
+  plugin.emit({ type: "session.created", properties: { info: { id: "session-1" } } });
+  await Promise.resolve();
 
   for (let i = 0; i < 9; i++) await call(plugin, "session-1", { system: [] });
   const output = { system: [] as string[] };
   await call(plugin, "session-1", output);
 
   expect(output.system).toHaveLength(1);
-  expect(output.system[0]).toContain("全局 AGENTS.md");
+  expect(output.system[0].text).toContain("全局 AGENTS.md");
   expect(logs).toMatchObject([{ trigger: "periodic", callsSinceReminder: 0 }]);
   const next = { system: [] as string[] };
   await call(plugin, "session-1", next);
@@ -35,13 +60,15 @@ test("reminds on the tenth normal model call and resets the interval", async () 
 
 test("reminds once after compaction without counting the compaction call", async () => {
   const logs: any[] = [];
-  const plugin = await AgentsMDReminderPlugin({ client: clientFor(logs) } as any);
-  await plugin.event?.({ event: { type: "session.created", properties: { info: { id: "session-2" } } } } as any);
-  await plugin["experimental.session.compacting"]?.({ sessionID: "session-2" } as any, { context: [] } as any);
+  const plugin = await setup(logs);
+  plugin.emit({ type: "session.created", properties: { info: { id: "session-2" } } });
+  await Promise.resolve();
+  await plugin.hooks.get("compaction")?.({ sessionID: "session-2" });
   const summary = { system: [] as string[] };
   await call(plugin, "session-2", summary);
   expect(summary.system).toEqual([]);
-  await plugin.event?.({ event: { type: "session.compacted", properties: { sessionID: "session-2" } } } as any);
+  plugin.emit({ type: "session.compacted", properties: { sessionID: "session-2" } });
+  await Promise.resolve();
 
   const output = { system: [] as string[] };
   await call(plugin, "session-2", output);
@@ -55,9 +82,10 @@ test("reminds once after compaction without counting the compaction call", async
 
 test("isolates session counters and does not inject duplicate reminders", async () => {
   const logs: any[] = [];
-  const plugin = await AgentsMDReminderPlugin({ client: clientFor(logs) } as any);
-  await plugin.event?.({ event: { type: "session.created", properties: { info: { id: "session-3" } } } } as any);
-  await plugin.event?.({ event: { type: "session.created", properties: { info: { id: "session-4" } } } } as any);
+  const plugin = await setup(logs);
+  plugin.emit({ type: "session.created", properties: { info: { id: "session-3" } } });
+  plugin.emit({ type: "session.created", properties: { info: { id: "session-4" } } });
+  await Promise.resolve();
 
   for (let i = 0; i < 9; i++) await call(plugin, "session-3", { system: [] });
   const first = { system: [] as string[] };
@@ -71,10 +99,9 @@ test("isolates session counters and does not inject duplicate reminders", async 
 });
 
 test("continues the model call when reminder logging fails", async () => {
-  const plugin = await AgentsMDReminderPlugin({
-    client: { app: { log: async () => { throw new Error("log failed"); } } },
-  } as any);
-  await plugin.event?.({ event: { type: "session.created", properties: { info: { id: "session-5" } } } } as any);
+  const plugin = await setup([]);
+  plugin.emit({ type: "session.created", properties: { info: { id: "session-5" } } });
+  await Promise.resolve();
   for (let i = 0; i < 9; i++) await call(plugin, "session-5", { system: [] });
 
   const output = { system: [] as string[] };

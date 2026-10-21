@@ -50,13 +50,15 @@ helm = "latest"
 "github:artifacthub/hub" = "latest"
 "npm:defuddle" = "latest"
 
-"github:anomalyco/opencode" = "1.19.3"
+
+opencode = "latest"
 "go:github.com/grafana/gcx/cmd/gcx" = "latest"
+"go:github.com/tailscale/aperture-cli/cmd/aperture" = "v0.1.0"
 
 kubectl = "latest"
 helmfile = "latest"
 codex = "0.155.0"
 ruby = "latest"
 chezmoi = "latest"
+act = "0.2.89"
 "pipx:shodan" = "latest"
-

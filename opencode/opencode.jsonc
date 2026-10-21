@@ -96,6 +96,9 @@
     },
     "build": {
       "model": "openai/sol-6.1"
+    },
+    "explore": {
+      "model": "openai/luna-6"
     }
   },
   "model": "openai/sol-6.1",
@@ -537,6 +540,7 @@
       "effect": "allow"
     }
   ],
+  "shell": "/bin/zsh",
   "permissions": [
     {
       "action": "shell",
@@ -3253,5 +3257,8 @@
       "resource": "/tmp/opencode/**",
       "effect": "allow"
     }
-  ]
+  ],
+  "worktree": {
+    "directory": "./worktrees"
+  }
 }

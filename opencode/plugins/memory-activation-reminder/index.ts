@@ -81,7 +81,12 @@ export const MemoryActivationReminderPlugin = Plugin.define({
   const controller = new AbortController();
   void (async () => {
     for await (const event of client.event.subscribe({ signal: controller.signal })) {
-      const { type, properties } = event as { type: string; properties: Record<string, unknown> };
+      const record = (event ?? {}) as {
+        type?: string;
+        properties?: Record<string, unknown>;
+      };
+      const type = record.type;
+      const properties = record.properties ?? {};
       if (type === "session.created") {
         const info = properties.info as { id?: string } | undefined;
         if (info?.id) activeSessionId = info.id;

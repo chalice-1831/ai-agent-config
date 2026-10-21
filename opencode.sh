@@ -101,6 +101,11 @@ link() {
 		if [[ -L "${target}" && "$(readlink -- "${target}")" == "${src}" ]]; then
 			echo "[OK] ${target}"
 		else
+			# ln -sfn does not replace a real directory; remove it only after
+			# backup_file has preserved the previous target above.
+			if [[ -d "${target}" && ! -L "${target}" ]]; then
+				rm -rf -- "${target}"
+			fi
 			ln -sfn -- "${src}" "${target}"
 			echo "[LINK] ${target} -> ${src}"
 		fi

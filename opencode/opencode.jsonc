@@ -3,6 +3,9 @@
   "compaction": {
     "auto": true
   },
+   "experimental": {
+    "todo": true
+  },
   "mcp": {
     "servers": {
       "codegraph": {

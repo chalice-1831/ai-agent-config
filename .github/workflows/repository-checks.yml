@@ -1,0 +1,66 @@
+name: Repository Checks
+
+on:
+  pull_request:
+    paths:
+      - "codex.sh"
+      - "mise.sh"
+      - "scripts/**"
+      - "tests/test_codex_config.py"
+      - "codex/**"
+      - "mise.toml"
+      - ".github/workflows/repository-checks.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-tests:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependency
+        run: python -m pip install --disable-pip-version-check tomlkit==0.15.1
+
+      - name: Run Python tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
+  shell-and-config:
+    name: Shell and TOML checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Check shell syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            bash -n "$file"
+          done < <(find . -type f -name '*.sh' -not -path './.git/*' -print0)
+
+      - name: Install TOML parser
+        run: python -m pip install --disable-pip-version-check tomlkit==0.15.1
+
+      - name: Parse TOML configuration
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from tomlkit import parse
+
+          for filename in ("mise.toml", "codex/mcp.toml"):
+              parse(Path(filename).read_text())
+          PY

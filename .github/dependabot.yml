@@ -1,0 +1,10 @@
+version: 2
+
+# Dependency upgrades are planned manually. Security updates remain controlled
+# by repository settings.
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0

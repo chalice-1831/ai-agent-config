@@ -1,0 +1,48 @@
+{
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
+  "defaultProvider": "openai",
+  "defaultModel": "sol-6.1",
+  "defaultThinkingLevel": "high",
+  "modelThinkingLevels": {
+    "openai/luna-6": "high",
+    "openai/sol-6.1": "high",
+    "openai/astra-6": "low",
+    "anthropic/haiku-5-5": "high",
+    "anthropic/sonnet-5-5": "high",
+    "anthropic/opus-5-5": "low"
+  },
+  "enabledModels": [
+    "openai/astra-6",
+    "openai/sol-6.1",
+    "openai/luna-6",
+    "anthropic/opus-5-5",
+    "anthropic/sonnet-5-5",
+    "anthropic/haiku-5-5"
+  ],
+  "subagents": {
+    "agentOverrides": {
+      "scout": { "model": "openai/luna-6", "thinking": "low" },
+      "researcher": { "model": "openai/luna-6", "thinking": "medium" },
+      "evidence-auditor": { "model": "openai/sol-6.1", "thinking": "high" },
+      "worker": { "model": "openai/sol-6.1", "thinking": "high" },
+      "reviewer": { "model": "openai/sol-6.1", "thinking": "high" },
+      "oracle": { "model": "openai/astra-6", "thinking": "high" },
+      "delegate": { "model": "openai/astra-6", "thinking": "low" }
+    }
+  },
+  "transport": "websocket",
+  "shellPath": "/bin/zsh",
+  "extensions": [
+    "-builtin:mcp"
+  ],
+  "skills": [],
+  "packages": [
+    "git:github.com/NVlabs/SoL-Pi",
+    "npm:pi-mcp-adapter@5.4.0",
+    "npm:@gotgenes/pi-permission-system@41.0.0",
+    "npm:pi-web-access@0.44.0",
+    "npm:pi-subagents@0.80.0",
+    "npm:pi-powerline-footer@0.20.2",
+    "npm:@narumitw/pi-usage@0.68.0"
+  ]
+}

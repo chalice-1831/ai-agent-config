@@ -1,6 +1,6 @@
 ## ai-agent-config
 
-个人使用的 OpenCode 配置仓库，用来集中维护全局 agent 规则、OpenCode 配置、MCP 工具、插件和常用 skills 安装脚本。
+个人使用的 AI agent 配置仓库，用来集中维护全局 agent 规则、OpenCode、Codex 与 Pi 配置、MCP 工具、插件和常用 skills 安装脚本。
 
 这个仓库的目标不是做成通用发行版，而是把我自己的 AI 编程环境配置沉淀成可复用、可审计、可快速同步的版本化配置。其他人可以参考结构或 fork 后按自己的模型、密钥和工具链调整。
 
@@ -15,6 +15,8 @@
 ├── opencode.sh                  # 将配置链接到 OpenCode 配置目录的脚本
 ├── codex.sh                     # 安装 Codex 规则并同步共享 MCP
 ├── codex/                       # 共享 MCP、命令规则及安装说明
+├── pi.sh                        # 链接 Pi 静态资源，渲染并复制本机配置
+├── pi/                          # Pi settings、models 模板、MCP、扩展、prompts 及安装说明
 ├── opencode/
 │   ├── opencode.jsonc           # OpenCode 主配置：providers、MCP、plugins、permissions、formatters
 │   ├── dcp.jsonc                # Dynamic Context Pruning 配置
@@ -138,6 +140,12 @@ backup  占位命令，尚未实现
 OpenCode 权限审计插件仅记录弹出的权限申请及用户回复，包括原始 `pattern` 和项目根目录路径，不会自动修改权限白名单。记录按小时写入用户级 JSONL 文件，默认存放在 `~/.local/state/opencode/permission-audit/`（可通过 `XDG_STATE_HOME` 更改位置），文件权限为 `0600`。插件不会自动清理记录，旧文件需手动删除；写入失败时会记录错误，并在 TUI 可用时提示，不阻断审批。
 
 `opencode/dcp.jsonc` 维护 Dynamic Context Pruning 策略，用于控制上下文裁剪、压缩提醒、保护工具输出和错误清理。
+
+## Pi 配置
+
+使用 `./pi.sh link` 部署，使用 `./pi.sh diff` 检查。运行前需要 export `ANTHROPIC_BASE_URL`、`OPENAI_BASE_URL`；脚本仅渲染地址，API key 保留运行时环境引用。`models.json` 与合并后的 `settings.json` 复制为普通文件，其余受管资源软链接。
+
+完整安装步骤、环境变量、包安装及备份恢复见 [pi/README.md](pi/README.md)。
 
 ## Support Files
 

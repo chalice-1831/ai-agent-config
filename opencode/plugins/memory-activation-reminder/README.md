@@ -14,11 +14,7 @@
 
 ```mermaid
 flowchart TD
-    SkillEvent([message.part.updated]) --> ToolPart{Completed tool part?}
-    ToolPart -->|No| IgnoreSkill[Ignore event]
-    ToolPart -->|Yes| IsSkill{tool == skill?}
-    IsSkill -->|No| IgnoreSkill
-    IsSkill -->|Yes| SkillName[Extract skill name]
+    SkillEvent([session.skill.activated / execute.after]) --> SkillName[Extract skill ID]
 
     SkillName --> IsActivation{skill == memory-activation?}
     IsActivation -->|Yes| Clear[Clear pending activation]
@@ -26,7 +22,7 @@ flowchart TD
     SkipSkill -->|Yes| IgnoreSkill
     SkipSkill -->|No| MarkPending[Mark pending task skill for session]
 
-    SystemEvent([experimental.chat.system.transform]) --> PendingSystem{Pending task skill exists?}
+    SystemEvent([session.hook context]) --> PendingSystem{Pending task skill exists?}
     PendingSystem -->|No| IgnoreSystem[Ignore system transform]
     PendingSystem -->|Yes| AlreadyInjected{Already injected?}
     AlreadyInjected -->|Yes| IgnoreSystem
@@ -38,7 +34,8 @@ flowchart TD
     NonAction -->|Yes| IgnoreAction
     NonAction -->|No| AlreadyReminded{Already reminded?}
     AlreadyReminded -->|Yes| IgnoreAction
-    AlreadyReminded -->|No| Toast[Show toast and app log reminder]
+    AlreadyReminded -->|No| Toast[Emit RPC reminder and write server log]
+    Toast --> CLI[CLI plugin shows warning toast]
 ```
 
 ## 状态模型
@@ -56,10 +53,11 @@ pendingBySession[sessionID] = {
 - 加载 `memory-activation` 会清除该 session 的 pending state。
 - 加载 skiplist 中的 memory/reference skill 不会创建 pending state。
 - 加载其它 skill 会创建 pending state。
-- 下一次 `experimental.chat.system.transform` 会向 `output.system` 注入一次 agent-visible reminder。
+- 下一次 `session.hook("context")` 会向 `event.system` 注入一次 agent-visible reminder。
 - 下一次 non-action tool 会被忽略。
-- 下一次 action tool 会触发 human-visible toast 和 app log 备份提醒。
+- 下一次 action tool 会发送 RPC event，由 CLI plugin 显示 human-visible toast，并写入 server log 备份提醒。
 - 每次 pending skill load 最多注入一次 system reminder，也最多触发一次 toast/log reminder。
+- RPC event 投递失败会记录错误，并允许下一个 action tool 重试；不会阻塞工具执行。
 
 ## Skip Lists
 
@@ -88,7 +86,7 @@ agentmemory_memory_smart_search
 
 ## Agent Reminder Text
 
-hook 会向 `output.system` 追加一次这段文本：
+hook 会向 `event.system` 追加一次这段文本：
 
 ```text
 [Memory activation reminder]
@@ -97,7 +95,7 @@ You loaded task-specific/action skill "<skill>" but have not applied memory-acti
 
 ## Human And Log Reminder Text
 
-hook 也会显示 toast 并写入 app log：
+服务端 hook 写入 log，并发送 `rpc.memory-activation-reminder.reminder` event。`tui.ts` 订阅同一 directory 的提醒，通过 V2 的 `context.ui.toast.show()` 显示 warning toast；提醒携带 session ID，方便定位来源：
 
 ```text
 Loaded task skill "<skill>" without applying memory-activation. Load/apply memory-activation before acting, or state why it is skipped.
@@ -113,4 +111,8 @@ Loaded task skill "<skill>" without applying memory-activation. Load/apply memor
 
 ## 已知限制
 
-这个 MVP 通过完成态的 `skill` tool part 识别 skill load，注入一次 agent-visible system reminder，并在下一个 action tool 前保留 toast/log 作为 human-visible 备份。它不能证明 agent 真的把 memory 采纳进计划；这仍然由 `memory-activation` skill 和全局 `Memory Activation` 规则负责。
+这个 MVP 通过 V2 的 `session.skill.activated` 事件和 `skill` 工具的 `execute.after` hook 识别 skill load，注入一次 agent-visible system reminder，并在下一个 action tool 前保留 toast/log 作为 human-visible 备份。它不能证明 agent 真的把 memory 采纳进计划；这仍然由 `memory-activation` skill 和全局 `Memory Activation` 规则负责。
+
+V2 会自动加载插件目录中与 `index.ts` 并列的 `tui.ts`，不需要另行配置 `cli.json`。安装时必须保留整个目录，包括共享的 `rpc.ts`。已有 TUI 需要重新加载该插件或重启界面才能启用 CLI 入口。
+
+RPC event 是实时通知，不会重放。没有连接的 TUI，或 TUI 正在查看其它 directory 时不会显示 toast；服务端 log 和 agent-visible reminder 仍然保留。加载 `memory-activation` 后 pending state 已清除，因此后续 action tool 不会显示提醒。

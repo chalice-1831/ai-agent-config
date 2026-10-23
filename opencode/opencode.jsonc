@@ -1,9 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "compaction": {
-    "auto": true
+    "auto": true,
+    "buffer": 16000,
+    "keep": {
+      "tokens": 12000
+    }
   },
-   "experimental": {
+  "experimental": {
     "todo": true
   },
   "mcp": {
@@ -348,6 +352,7 @@
         "astra-6": {
           "limit": {
             "context": 200000,
+            "input": 128000,
             "output": 128000
           },
           "modelID": "astra-6",
@@ -405,13 +410,15 @@
         "sol-6.1": {
           "limit": {
             "context": 272000,
+            "input": 128000,
             "output": 128000
           },
           "cost": {
-            "input": 5,
-            "output": 30,
+            "input": 2,
+            "output": 10,
             "cache": {
-              "read": 0.5
+              "read": 0.1,
+              "write": 2.5
             }
           },
           "modelID": "sol-6.1",
@@ -469,6 +476,7 @@
         "luna-6": {
           "limit": {
             "context": 200000,
+            "input": 128000,
             "output": 128000
           },
           "modelID": "luna-6",

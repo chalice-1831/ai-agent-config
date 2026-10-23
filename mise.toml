@@ -1,34 +1,74 @@
 [settings]
-minimum_release_age = "7d"
+minimum_release_age = "0s"
+exec_auto_install = false
 
 [tools]
-# Language runtimes used by agents and project scripts.
-python = ["3.9", "3.10"]
+# 语言运行时与包管理器
 go = "1.25.12"
-node = "24.18.0"
-rust = "1.97.1"
-
-
-# CLI utilities commonly used by agents.
+node = "lts"
+rust = "stable"
+pnpm = "latest"
 uv = "latest"
-npm = "latest"
+
+# 终端与日常操作
+fzf = "latest"
+zoxide = "latest"
+eza = "latest"
+bat = "latest"
+starship = "latest"
+tmux = "latest"
+trzsz-ssh = "latest"
+lnav = "latest"
+mole = "latest"
+dust = "latest"
+delta = "latest"
+yazi = "latest"
+
+# AI Agent
+opencode = "latest"
+codex = "latest"
+pi = "1.3.0"
+
+# 文件搜索、代码搜索与数据处理
+ast-grep = "latest"
 ripgrep = "latest"
+fd = "latest"
 jq = "latest"
 yq = "latest"
-fd = "latest"
-ast-grep = "latest"
-gh = "latest"
+
+# Git 与代码托管
+github-cli = "latest"
+lazygit = "latest"
+
+# 构建、接口定义与部署
 helm = "latest"
+protoc = "29.3"
+cmake = "latest"
+ninja = "latest"
 
+# GitHub 来源
+"github:clice-io/clice" = { version = "latest", prerelease = true }
 
-# Python tooling.
-"pipx:black" = "latest"
+# Conda 模块来源
+"conda:clang-format" = "latest"
+"conda:clang" = "latest"
+"conda:clangxx" = "latest"
 
-# Go tooling.
-"go:golang.org/x/tools/gopls" = "latest"
+# Go 模块来源
+"go:github.com/go-delve/delve/cmd/dlv" = { version = "v1.25.2", depends = "go@1.25.12" }
+"go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint" = { version = "v2.4.0", depends = "go@1.25.12" }
+"go:github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2" = { version = "v2.27.2", depends = "go@1.25.12" }
+"go:google.golang.org/protobuf/cmd/protoc-gen-go" = { version = "v1.36.5", depends = "go@1.25.12" }
+"go:github.com/grafana/gcx/cmd/gcx" = { version = "latest", depends = "go@1.25.12" }
+"go:mvdan.cc/sh/v3/cmd/shfmt" = { version = "latest", depends = "go@1.25.12" }
+"go:golang.org/x/tools/gopls" = { version = "latest", depends = "go@1.25.12" }
 
-# Formatters, linters, and language servers installed from npm.
-"go:mvdan.cc/sh/v3/cmd/shfmt" = "latest"
+# PyPI 来源
+"pypi:ruff" = "latest"
+"pypi:basedpyright" = "latest"
+"pypi:black" = "latest"
+
+# npm 来源
 "npm:@biomejs/biome" = "latest"
 "npm:@mermaid-js/mermaid-cli" = "latest"
 "npm:dockerfile-language-server-nodejs" = "latest"
@@ -42,23 +82,6 @@ helm = "latest"
 "npm:yaml-language-server" = "latest"
 "npm:@playwright/cli" = "latest"
 "npm:@colbymchenry/codegraph" = "latest"
-
-# Python linters/type checkers exposed through pipx.
-"pipx:basedpyright" = "latest"
-"pipx:ruff" = "latest"
-
-"github:artifacthub/hub" = "latest"
 "npm:defuddle" = "latest"
-
-
-opencode = "latest"
-"go:github.com/grafana/gcx/cmd/gcx" = "latest"
-"go:github.com/tailscale/aperture-cli/cmd/aperture" = "v0.1.0"
-
-kubectl = "latest"
-helmfile = "latest"
-codex = "0.155.0"
-ruby = "latest"
-chezmoi = "latest"
-act = "0.2.89"
-"pipx:shodan" = "latest"
+"npm:@bufbuild/buf" = "latest"
+"npm:@blueking/bk-cli" = "latest"

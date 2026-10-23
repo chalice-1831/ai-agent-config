@@ -1,4 +1,5 @@
 import { Plugin } from "@opencode/plugin";
+import { MemoryActivationReminderRpc } from "./rpc";
 
 const ACTIVATION_SKILL = "memory-activation";
 
@@ -30,42 +31,31 @@ type PendingActivation = {
 function extractSkillName(input: unknown): string {
   if (!input || typeof input !== "object") return "";
   const record = input as Record<string, unknown>;
-  for (const key of ["name", "skill", "skillName"]) {
+  for (const key of ["id", "name", "skill", "skillName"]) {
     const value = record[key];
     if (typeof value === "string" && value.trim()) return value.trim();
   }
   return "";
 }
 
-function sessionIdFrom(properties: Record<string, unknown>, part?: Record<string, unknown>): string {
-  const value = part?.sessionID ?? properties.sessionID;
-  return typeof value === "string" ? value : "";
-}
-
-function toolNameFrom(input: Record<string, unknown>): string {
-  const tool = input.tool;
-  return typeof tool === "string" ? tool : "";
-}
-
 export const MemoryActivationReminderPlugin = Plugin.define({
   id: "memory-activation-reminder",
   async setup(ctx) {
-  const client = (ctx as any).client ?? ctx;
+  const client = ctx;
   const pendingBySession = new Map<string, PendingActivation>();
-  let activeSessionId = "";
+  const reminders = await ctx.rpc.register(MemoryActivationReminderRpc, {});
 
   async function remind(sessionID: string, pending: PendingActivation): Promise<void> {
     if (pending.reminded) return;
     pending.reminded = true;
     const message = `Loaded task skill "${pending.skill}" without applying ${ACTIVATION_SKILL}. Load/apply ${ACTIVATION_SKILL} before acting, or state why it is skipped.`;
+    console.warn(`[memory-activation-reminder] ${sessionID}: ${message}`);
     try {
-      await client.tui.showToast({
-        body: { title: "Memory activation", message, variant: "warning" },
-      });
-    } catch {}
-    try {
-      await client.app.log({ body: { service: "memory-activation-reminder", level: "warn", message, sessionID } });
-    } catch {}
+      await reminders.events.emit("reminder", { sessionID, message });
+    } catch (error) {
+      pending.reminded = false;
+      console.error(`[memory-activation-reminder] Failed to emit reminder for ${sessionID}`, error);
+    }
   }
 
   function handleSkill(sessionID: string, skillName: string): void {
@@ -83,36 +73,34 @@ export const MemoryActivationReminderPlugin = Plugin.define({
     for await (const event of client.event.subscribe({ signal: controller.signal })) {
       const record = (event ?? {}) as {
         type?: string;
-        properties?: Record<string, unknown>;
+        data?: Record<string, unknown>;
       };
       const type = record.type;
-      const properties = record.properties ?? {};
-      if (type === "session.created") {
-        const info = properties.info as { id?: string } | undefined;
-        if (info?.id) activeSessionId = info.id;
-        continue;
-      }
-      if (type === "session.deleted") {
-        const info = properties.info as { id?: string } | undefined;
-        if (info?.id) pendingBySession.delete(info.id);
-        continue;
-      }
-      if (type !== "message.part.updated") continue;
-
-      const part = properties.part as Record<string, unknown> | undefined;
-      if (!part || part.type !== "tool") continue;
-      const state = part.state as Record<string, unknown> | undefined;
-      if (state?.status !== "completed") continue;
-      const sessionID = sessionIdFrom(properties, part) || activeSessionId;
+      const data = record.data ?? {};
+      const sessionID = typeof data.sessionID === "string" ? data.sessionID : "";
       if (!sessionID) continue;
-      const toolName = typeof part.tool === "string" ? part.tool : "";
-      if (toolName !== "skill") continue;
-      handleSkill(sessionID, extractSkillName(state.input));
+      if (type === "session.deleted") {
+        pendingBySession.delete(sessionID);
+        continue;
+      }
+      if (type === "session.skill.activated") {
+        handleSkill(sessionID, extractSkillName(data));
+      }
     }
-  })();
+  })().catch((error) => {
+    if (!controller.signal.aborted) {
+      console.error("[memory-activation-reminder] Event subscription failed", error);
+    }
+  });
+
+  await client.tool.hook("execute.after", (event: any) => {
+      if (event.tool === "skill" && event.status === "completed") {
+        handleSkill(event.sessionID, extractSkillName(event.input));
+      }
+  });
 
   await client.tool.hook("execute.before", async (event: any) => {
-      const sessionID = typeof event.sessionID === "string" ? event.sessionID : activeSessionId;
+      const sessionID = event.sessionID;
       if (!sessionID) return;
       const pending = pendingBySession.get(sessionID);
       if (!pending || pending.reminded) return;
@@ -122,7 +110,7 @@ export const MemoryActivationReminderPlugin = Plugin.define({
   });
 
   await client.session.hook("context", async (event: any) => {
-      const sessionID = event.sessionID || activeSessionId;
+      const sessionID = event.sessionID;
       if (!sessionID || !Array.isArray(event.system)) return;
       const pending = pendingBySession.get(sessionID);
       if (!pending || pending.injected) return;

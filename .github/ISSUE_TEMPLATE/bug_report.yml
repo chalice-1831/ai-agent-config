@@ -1,0 +1,93 @@
+name: Bug 报告 / Bug Report
+description: 提交一个可复现的问题 / Submit a reproducible problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写此缺陷报告！详细信息有助于更快定位问题。
+        Thanks for reporting a bug! Detailed information helps us investigate it faster.
+
+        提交前请先搜索现有 issues，避免重复。
+        Please search existing issues before submitting to avoid duplicates.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 提交前检查 / Pre-submission Checklist
+      description: 提交前请确认以下内容 / Please confirm the following before submitting
+      options:
+        - label: 我已搜索现有 issues，此 Bug 尚未被报告 / I have searched existing issues and this bug has not been reported
+          required: true
+        - label: 我已阅读 [项目文档 / Documentation](https://github.com/zouxingyuks/ai-agent-config/blob/master/README.md)
+          required: true
+        - label: 我可以稳定复现此问题 / I can reliably reproduce this issue
+          required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 问题描述 / Problem Description
+      description: 请描述实际发生了什么 / Describe what happened
+      placeholder: |
+        重现步骤 / Steps to reproduce:
+        1. 执行命令... / Run the command...
+        2. 修改配置... / Change the configuration...
+        3. 出现错误... / The error occurs...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为 / Expected Behavior
+      description: 描述你期望发生的行为 / Describe what you expected to happen
+      placeholder: 正常情况下应该... / Normally it should...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 涉及范围 / Affected Area
+      description: 问题出现在哪个目录或能力？/ Which area is affected?
+      options:
+        - Agent rules / AGENTS.md
+        - OpenCode configuration / opencode/
+        - OpenCode plugins / opencode/plugins/
+        - Codex configuration / codex/
+        - Skills / skills/
+        - Installation scripts / *.sh
+        - CI and repository automation / .github/
+        - Documentation / README.md
+        - Other / 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境信息 / Environment
+      description: 请填写相关版本和环境 / Provide relevant versions and environment details
+      value: |
+        - ai-agent-config commit / version:
+        - Operating system:
+        - OpenCode version: (if applicable)
+        - Codex version: (if applicable)
+        - mise version: (if applicable)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志 / Relevant Logs
+      description: 请粘贴相关日志，将自动格式化为代码块 / Paste relevant logs; they will be formatted as code
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 附加信息 / Additional Context
+      description: 补充截图、配置片段或其他上下文 / Add screenshots, configuration excerpts, or other context

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 项目文档 / Documentation
+    url: https://github.com/zouxingyuks/ai-agent-config/blob/master/README.md
+    about: 先查阅项目说明 / Read the project documentation first
+  - name: 安全漏洞 / Security Vulnerabilities
+    url: https://github.com/zouxingyuks/ai-agent-config/security/advisories/new
+    about: 请通过私密渠道报告安全漏洞 / Report security vulnerabilities privately

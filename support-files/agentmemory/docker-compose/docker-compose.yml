@@ -10,7 +10,7 @@ services:
     container_name: agentmemory
     restart: unless-stopped
     mem_reservation: 256m
-    mem_limit: 2g
+    mem_limit: 8g
     ports:
       - "0.0.0.0:3111:3111"
       - "127.0.0.1:3113:3113"
@@ -39,6 +39,7 @@ services:
       CONSOLIDATION_DECAY_DAYS: ${CONSOLIDATION_DECAY_DAYS:-30}
       GRAPH_EXTRACTION_BATCH_SIZE: ${GRAPH_EXTRACTION_BATCH_SIZE:-8}
       AGENTMEMORY_LLM_NOTHINK: ${AGENTMEMORY_LLM_NOTHINK:-}
+      AGENTMEMORY_SLOTS: ${AGENTMEMORY_SLOTS:-false}
       AGENTMEMORY_REFLECT: ${AGENTMEMORY_REFLECT:-}
       AGENTMEMORY_DROP_STALE_INDEX: ${AGENTMEMORY_DROP_STALE_INDEX:-}
       AGENTMEMORY_IMAGE_EMBEDDINGS: ${AGENTMEMORY_IMAGE_EMBEDDINGS:-}

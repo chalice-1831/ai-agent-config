@@ -137,6 +137,44 @@ backup  占位命令，尚未实现
 
 OpenCode 权限审计插件仅记录弹出的权限申请及用户回复，包括原始 `pattern` 和项目根目录路径，不会自动修改权限白名单。记录按小时写入用户级 JSONL 文件，默认存放在 `~/.local/state/opencode/permission-audit/`（可通过 `XDG_STATE_HOME` 更改位置），文件权限为 `0600`。插件不会自动清理记录，旧文件需手动删除；写入失败时会记录错误，并在 TUI 可用时提示，不阻断审批。
 
+### OpenCode 宿主 Trace（OTLP）
+
+OpenCode 原生支持通过 OTLP/HTTP 导出宿主运行时的 trace。它不需要额外插件；使用已有的 OpenTelemetry Collector、Tempo 或其他兼容 OTLP/HTTP 的接收端即可。
+
+设置 OTLP/HTTP 基础地址：
+
+```bash
+opencode service set env OTEL_EXPORTER_OTLP_ENDPOINT "<OTLP_HTTP_ENDPOINT>"
+```
+
+`<OTLP_HTTP_ENDPOINT>` 应填写接收端的基础 URL，不要附加 `/v1/traces`。OpenCode 会自动发送到：
+
+- `<OTLP_HTTP_ENDPOINT>/v1/traces`
+- `<OTLP_HTTP_ENDPOINT>/v1/logs`
+
+如果接收端需要认证 header，可使用占位符配置，真实凭据不要写入仓库：
+
+```bash
+opencode service set env OTEL_EXPORTER_OTLP_HEADERS "<HEADER_NAME>=<HEADER_VALUE>"
+```
+
+设置 service 环境变量后，必须重启后台 server，确保新进程继承配置：
+
+```bash
+opencode service restart
+```
+
+验证配置和服务状态：
+
+```bash
+opencode service get env OTEL_EXPORTER_OTLP_ENDPOINT
+opencode service status
+```
+
+然后在 trace 后端按 `service.name = "opencode"` 查询。只看到配置值并不代表已经导出成功，必须以接收端实际收到的 trace 为准。
+
+设置该 endpoint 会同时启用 OTLP trace 和 OTLP logs；如果只需要宿主 trace，应在 Collector 或后端配置日志过滤、脱敏和保留策略。具体能看到哪些组件 span 取决于 OpenCode 版本和实际执行路径，接入成功不等于所有内部组件都已自动覆盖。
+
 `opencode/dcp.jsonc` 维护 Dynamic Context Pruning 策略，用于控制上下文裁剪、压缩提醒、保护工具输出和错误清理。
 
 ## Support Files

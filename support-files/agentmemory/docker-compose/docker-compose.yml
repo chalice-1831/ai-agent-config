@@ -9,6 +9,8 @@ services:
         III_SDK_VERSION: "0.22.1"
     container_name: agentmemory
     restart: unless-stopped
+    mem_reservation: 256m
+    mem_limit: 8g
     ports:
       - "0.0.0.0:3111:3111"
       - "127.0.0.1:3113:3113"

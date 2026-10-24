@@ -92,16 +92,32 @@
   },
   "agents": {
     "title": {
-      "model": "openai/luna-6"
+      "model": {
+        "providerID": "openai",
+        "model": "luna-6",
+        "variant": "high"
+      }
     },
     "plan": {
-      "model": "openai/sol-6.1"
+      "model": {
+        "providerID": "openai",
+        "model": "sol-6.1",
+        "variant": "high"
+      }
     },
     "build": {
-      "model": "openai/sol-6.1"
+      "model": {
+        "providerID": "openai",
+        "model": "sol-6.1",
+        "variant": "high"
+      }
     },
     "explore": {
-      "model": "openai/luna-6"
+      "model": {
+        "providerID": "openai",
+        "model": "luna-6",
+        "variant": "high"
+      }
     }
   },
   "model": "openai/sol-6.1",

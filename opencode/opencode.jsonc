@@ -1,10 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "compaction": {
-    "auto": true
+    "auto": false
   },
   "experimental": {
-    "todo": true
+    "todo": true,
+    "location_idle_timeout": "24 hours",
+    "portable_shell_scanner": true
   },
   "mcp": {
     "servers": {

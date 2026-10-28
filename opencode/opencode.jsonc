@@ -90,7 +90,8 @@
       "node_modules/**",
       "dist/**",
       ".git/**",
-      "*.log"
+      "*.log",
+      ".worktrees/**"
     ]
   },
   "agents": {
@@ -3281,6 +3282,6 @@
     }
   ],
   "worktree": {
-    "directory": "./worktrees"
+    "directory": "./.worktrees"
   }
 }

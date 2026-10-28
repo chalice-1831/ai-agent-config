@@ -3,7 +3,7 @@
   "compaction": {
     "auto": true
   },
-   "experimental": {
+  "experimental": {
     "todo": true
   },
   "mcp": {
@@ -41,7 +41,9 @@
         "command": [
           "npx",
           "-y",
-          "@upstash/context7-mcp"
+          "@upstash/context7-mcp",
+          "--api-key",
+          "{env:CONTEXT7_API_KEY}"
         ]
       },
       "deepwiki": {

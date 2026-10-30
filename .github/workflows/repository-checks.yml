@@ -7,6 +7,9 @@ on:
       - "mise.sh"
       - "scripts/**"
       - "tests/test_codex_config.py"
+      - "tests/pi-*.test.ts"
+      - "tests/pi-harness.ts"
+      - "pi/extensions/**"
       - "codex/**"
       - "mise.toml"
       - ".github/workflows/repository-checks.yml"
@@ -19,6 +22,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  node-tests:
+    name: Pi extension tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Run Pi extension tests
+        run: node --test tests/pi-*.test.ts
+
   python-tests:
     name: Python tests
     runs-on: ubuntu-latest

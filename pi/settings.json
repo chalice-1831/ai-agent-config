@@ -1,0 +1,31 @@
+{
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
+  "defaultProvider": "openai",
+  "defaultModel": "sol-6.1",
+  "defaultThinkingLevel": "high",
+  "modelThinkingLevels": {
+    "openai/luna-6": "high",
+    "openai/sol-6.1": "high",
+    "openai/astra-6": "low",
+    "anthropic/haiku-5-5": "high",
+    "anthropic/sonnet-5-5": "high",
+    "anthropic/opus-5-5": "low"
+  },
+  "enabledModels": [
+    "openai/astra-6",
+    "openai/sol-6.1",
+    "openai/luna-6",
+    "anthropic/opus-5-5",
+    "anthropic/sonnet-5-5",
+    "anthropic/haiku-5-5"
+  ],
+  "transport": "websocket",
+  "shellPath": "/bin/zsh",
+  "extensions": [],
+  "skills": [],
+  "packages": [
+    "git:github.com/NVlabs/SoL-Pi",
+    "npm:@gotgenes/pi-permission-system@41.0.0",
+    "npm:pi-web-access@0.44.0"
+  ]
+}

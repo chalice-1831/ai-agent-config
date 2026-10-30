@@ -1,6 +1,6 @@
 ## ai-agent-config
 
-个人使用的 OpenCode 配置仓库，用来集中维护全局 agent 规则、OpenCode 配置、MCP 工具、插件和常用 skills 安装脚本。
+个人使用的 AI agent 配置仓库，用来集中维护全局 agent 规则、OpenCode、Codex 与 Pi 配置、MCP 工具、插件和常用 skills 安装脚本。
 
 这个仓库的目标不是做成通用发行版，而是把我自己的 AI 编程环境配置沉淀成可复用、可审计、可快速同步的版本化配置。其他人可以参考结构或 fork 后按自己的模型、密钥和工具链调整。
 
@@ -15,12 +15,15 @@
 ├── opencode.sh                  # 将配置链接到 OpenCode 配置目录的脚本
 ├── codex.sh                     # 安装 Codex 规则并同步共享 MCP
 ├── codex/                       # 共享 MCP、命令规则及安装说明
+├── pi.sh                        # 链接 Pi 静态资源，渲染并复制本机配置
+├── pi/                          # Pi settings、models 模板、MCP、扩展、prompts 及安装说明
 ├── opencode/
 │   ├── opencode.jsonc           # OpenCode 主配置：providers、MCP、plugins、permissions、formatters
 │   ├── dcp.jsonc                # Dynamic Context Pruning 配置
 │   └── plugins/                 # 本地 OpenCode 插件
 ├── support-files/
 │   └── agentmemory/docker-compose/ # agentmemory Docker Compose 运行模板
+├── tests/                       # OpenCode 插件与 Pi 扩展的单元测试（Node / Bun / Python）
 └── scripts/
     └── skills.sh                # 全局安装常用 OpenCode skills
 ```
@@ -177,6 +180,12 @@ opencode service status
 
 `opencode/dcp.jsonc` 维护 Dynamic Context Pruning 策略，用于控制上下文裁剪、压缩提醒、保护工具输出和错误清理。
 
+## Pi 配置
+
+使用 `./pi.sh link` 部署，使用 `./pi.sh diff` 检查。运行前需要 export `ANTHROPIC_BASE_URL`、`OPENAI_BASE_URL`；脚本仅渲染地址，API key 保留运行时环境引用。`models.json` 与合并后的 `settings.json` 复制为普通文件，其余受管资源软链接。
+
+完整安装步骤、环境变量、包安装及备份恢复见 [pi/README.md](pi/README.md)。
+
 ## Support Files
 
 `support-files/agentmemory/docker-compose/` 维护 agentmemory Docker Compose 运行模板，可供 OpenCode、Codex 或其他 agent 共用同一个 memory server。真实 `.env` 不进入仓库，按子目录 README 从 `.env.example` 复制后填写本机配置。
@@ -203,6 +212,17 @@ mise install
 ```bash
 ./scripts/skills.sh
 ```
+
+运行测试：
+
+```bash
+node --test tests/pi-*.test.ts   # Pi 扩展，仅需 Node，不依赖宿主包
+bun test tests/agents-md-reminder.test.ts tests/sequential-thinking-reminder.test.ts \
+  tests/agentmemory-capture.test.ts tests/permission-audit.test.ts   # OpenCode 插件，需宿主包
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+Pi 扩展测试使用 Node 内置 test runner 与 `node:assert`，直接运行 `.ts` 源码依赖 Node 的类型剥离能力（Node 22.18+ / 24 LTS 起默认开启），无需安装依赖或 loader，因此 CI 的 `Pi extension tests` job 只装 Node。测试内的相对导入显式带 `.ts` 后缀——这是 Node ESM 的要求，Bun 允许省略。OpenCode 插件的 `tests/*.test.ts` 仍沿用 Bun runner：它们从插件源码导入 `@opencode/plugin`，该包由 OpenCode 配置目录的 `node_modules` 提供，仓库内没有 vendored 副本，本机未安装对应宿主包时这些用例会失败，CI 也不跑这组。
 
 ## 注意事项
 

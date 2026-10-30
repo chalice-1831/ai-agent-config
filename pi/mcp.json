@@ -1,0 +1,42 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "codegraph",
+      "exposure": "deferred",
+      "args": ["serve", "--mcp"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "exposure": "deferred"
+    },
+    "exa": {
+      "command": "npx",
+      "args": ["-y", "exa-mcp-server"],
+      "exposure": "deferred"
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "exposure": "deferred",
+      "env": { "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}" }
+    },
+    "deepwiki": { "url": "https://mcp.deepwiki.com/mcp", "exposure": "deferred" },
+    "gh_grep": { "url": "https://mcp.grep.app", "exposure": "deferred" },
+    "mise": {
+      "command": "mise",
+      "exposure": "deferred",
+      "args": ["mcp"],
+      "env": { "MISE_EXPERIMENTAL": "1" }
+    },
+    "agentmemory": {
+      "command": "npx",
+      "args": ["-y", "@agentmemory/mcp"],
+      "exposure": "deferred",
+      "env": {
+        "AGENTMEMORY_URL": "${AGENTMEMORY_URL}",
+        "AGENTMEMORY_SECRET": "${AGENTMEMORY_SECRET}"
+      }
+    }
+  }
+}

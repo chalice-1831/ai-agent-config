@@ -23,7 +23,7 @@
 |First Principles & Ablation:trigger on high-cost design, architecture/public-contract/data-model/security changes, performance/correctness/reliability claims, or explicit deep-research requests|first reduce the problem to invariants, constraints, and success criteria after retrieval/local-pattern discovery|run mental ablation before adding abstractions/dependencies/config/process: if removing the proposed element still satisfies the task, keep the simpler baseline|real measurements are required before relying on performance claims; otherwise record the baseline-preserving choice and verification path
 |Simplicity First:minimum code that solves request|no speculative features/abstractions/configurability|rewrite if overcomplicated
 |Surgical Changes:touch only required lines|match existing style|no unrelated cleanup/refactor|remove only orphans created by own changes|do not chase formatter-only or auto-formatting diffs once required checks pass; fix accidental corruption, syntax breakage, semantic changes, or behavior changes, but accept harmless whitespace/blank-line/table-alignment drift caused by formatting tools
-|Goal-Driven Execution:define verifiable success criteria|for multi-step tasks use brief plan with checks|loop until verified through requested surface
+|Goal-Driven Execution:define verifiable success criteria|for multi-step tasks use brief plan with checks|verify stage outcomes, not every step; reuse valid evidence|add checks only for relevant changes, evidence gaps, or informative debugging; stop when success criteria are verified through the requested surface
 
 <!-- agentmemory:start -->
 

@@ -1,0 +1,5 @@
+*
+!Dockerfile
+!entrypoint.sh
+!worker-compose.yaml
+!iii.worker.yaml

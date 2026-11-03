@@ -5,8 +5,10 @@
 ## 文件
 
 - `docker-compose.yml`: 构建并运行 `agentmemory`。
-- `Dockerfile`: 固定 `@agentmemory/agentmemory` 和 iii runtime 的兼容版本。
-- `entrypoint.sh`: 准备持久化存储，生成 HMAC secret，并启动 `agentmemory`。
+- `Dockerfile`: 分离 npm 依赖安装与运行阶段，固定 `@agentmemory/agentmemory` 0.9.31、iii 0.25.0、state 0.22.20 和 http 0.22.7。
+- `entrypoint.sh`: 准备持久化存储、迁移旧凭据，并通过 iii Worker Compose 启动服务。
+- `worker-compose.yaml`: 定义 state、http 和 agentmemory worker，启动应用前探测 `state::get` 是否可用，并显式转发本 Compose stack 的环境变量。
+- `iii.worker.yaml`: agentmemory worker 的启动声明。
 - `.env.example`: 环境变量模板。复制为 `.env` 后填写本机值，不要提交 `.env`。
 
 ## 端口
@@ -27,11 +29,13 @@ $EDITOR .env
 docker compose up -d --build
 ```
 
-从首次启动日志中取得生成的 MCP secret：
+服务启动成功后读取生成的 bearer secret（不要分享或写入日志）：
 
 ```bash
-docker compose logs agentmemory | grep AGENTMEMORY_SECRET
+docker compose exec agentmemory cat /data/secret
 ```
+
+secret 保存在数据卷内，新版不再将它打印到启动日志。首次启动需要联网下载固定版本的 state/http worker，下载缓存保存在数据卷内。
 
 验证 API：
 
@@ -45,16 +49,43 @@ curl -fsS http://127.0.0.1:3111/agentmemory/livez
 http://127.0.0.1:3113
 ```
 
+## 从 0.9.30 升级
+
+新版使用 [官方 Worker Compose 运行方式](https://agent-memory.dev/docs/deployment.md#docker)，不再生成或加载旧 `iii-config.yaml`，也不再使用 3112 端口。保持当前 Compose project 名称及 `agentmemory-data` 数据卷不变。
+
+先构建镜像，再停止旧实例、离线备份完整数据卷，最后启动新版：
+
+```bash
+docker compose build
+docker compose stop agentmemory
+mkdir -p backups
+chmod 700 backups
+docker compose run --rm --no-deps --entrypoint tar agentmemory -C /data -czf - . > "backups/agentmemory-$(date +%Y%m%d-%H%M%S).tar.gz"
+docker compose up -d
+docker compose ps
+curl -fsS http://127.0.0.1:3111/agentmemory/livez
+```
+
+确认备份命令成功后再启动新版。备份包含凭据及全部记忆，应私密保存。不要执行 `docker compose down -v`，不要让两个实例同时访问同一数据卷。
+
+- `/data/state_store.db` 原位保留，索引、快照等目录也留在原卷中。
+- 若 `/data/secret` 尚不存在，入口会把旧 `/data/.hmac` 复制为 `/data/secret` 并设置 `0600` 权限；保留旧文件及原 secret，现有客户端无需换密钥。
+- 数据目录权限仅在首次迁移时递归调整，后续启动使用迁移标记避免重复遍历。
+- 新版运行日志及 Worker Compose 缓存也在 `/data`；首次启动可能需要等待 worker 下载完成。
+- 如需回滚，先停止新版，用旧版配置和镜像恢复**升级前完整备份**。不要直接让旧 runtime 写入已被新版使用的数据卷。
+
+自定义环境变量需要同时出现在 `docker-compose.yml` 和 `worker-compose.yaml` 的 agentmemory `environment` 中；Worker Compose 不会自动继承所有父进程变量。当前 worker 配置与官方部署一样固定使用 `/data`，不要单独把 `AGENTMEMORY_DATA_DIR` 改成其他路径。
+
 ## Agent 环境变量
 
 需要接入这个服务的 agent 启动前设置：
 
 ```bash
 export AGENTMEMORY_URL=http://127.0.0.1:3111
-export AGENTMEMORY_SECRET='<value from docker compose logs>'
+export AGENTMEMORY_SECRET='<value from /data/secret>'
 ```
 
-如果 agent 运行在另一台机器上，使用宿主机 IP 替代 `127.0.0.1`。
+如果 agent 运行在另一台机器上，通过 HTTPS 反向代理连接此服务，或使用 SSH 隧道；不要在不可信网络中通过明文 HTTP 发送 bearer secret。
 
 这些变量属于本机 CLI/MCP shim 或 agent 进程，不属于服务容器配置，所以不放进 `.env.example`。需要诊断 agent 侧连接时，可在 agent 进程环境中临时设置 `AGENTMEMORY_DEBUG=1`、`AGENTMEMORY_FORCE_PROXY=1` 或 `AGENTMEMORY_PROBE_TIMEOUT_MS=2000`。
 

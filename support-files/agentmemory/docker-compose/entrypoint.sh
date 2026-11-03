@@ -1,84 +1,123 @@
 #!/bin/sh
+# Based on agentmemory v0.9.31 deploy/runtime/entrypoint.sh.
 set -eu
 
 DATA_DIR="${AGENTMEMORY_DATA_DIR:-/data}"
-HMAC_FILE="${AGENTMEMORY_HMAC_FILE:-/data/.hmac}"
-RUN_AS="node:node"
-III_CONFIG="/opt/agentmemory/node_modules/@agentmemory/agentmemory/dist/iii-config.yaml"
-
 export AGENTMEMORY_DATA_DIR="$DATA_DIR"
+export HOME="${HOME:-$DATA_DIR/home}"
+export III_COMPOSE_STATE_DIR="${III_COMPOSE_STATE_DIR:-$DATA_DIR/compose-state}"
+export III_ENGINE_PORT="${III_ENGINE_PORT:-49134}"
+export III_REST_PORT="${III_REST_PORT:-3111}"
+export III_VIEWER_PORT="${III_VIEWER_PORT:-3113}"
+export III_TELEMETRY_ENABLED="${III_TELEMETRY_ENABLED:-false}"
+export AGENTMEMORY_VIEWER_HOST="${AGENTMEMORY_VIEWER_HOST:-0.0.0.0}"
+export AGENTMEMORY_STATE_SAVE_INTERVAL_MS="${AGENTMEMORY_STATE_SAVE_INTERVAL_MS:-2000}"
+case "$AGENTMEMORY_STATE_SAVE_INTERVAL_MS" in
+'' | *[!0-9]*)
+	echo "AGENTMEMORY_STATE_SAVE_INTERVAL_MS must be an integer between 100 and 3600000" >&2
+	exit 1
+	;;
+esac
+if [ "$AGENTMEMORY_STATE_SAVE_INTERVAL_MS" -lt 100 ] || [ "$AGENTMEMORY_STATE_SAVE_INTERVAL_MS" -gt 3600000 ]; then
+	echo "AGENTMEMORY_STATE_SAVE_INTERVAL_MS must be an integer between 100 and 3600000" >&2
+	exit 1
+fi
+export VIEWER_ALLOWED_HOSTS="${VIEWER_ALLOWED_HOSTS:-localhost:3113,127.0.0.1:3113,[::1]:3113}"
+export VIEWER_ALLOWED_ORIGINS="${VIEWER_ALLOWED_ORIGINS:-http://localhost:3113,http://127.0.0.1:3113}"
+export REST_ALLOWED_ORIGINS="${REST_ALLOWED_ORIGINS:-http://localhost:3111,http://127.0.0.1:3111,http://localhost:3113,http://127.0.0.1:3113}"
+export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-2}"
 
 mkdir -p "$DATA_DIR"
-chown -R "$RUN_AS" "$DATA_DIR"
+# Preserve old credentials without logging them; an explicit secret takes precedence.
+LEGACY_HMAC_FILE="${AGENTMEMORY_HMAC_FILE:-$DATA_DIR/.hmac}"
+if [ -z "${AGENTMEMORY_SECRET:-}" ] && [ ! -e "$DATA_DIR/secret" ] && [ -s "$LEGACY_HMAC_FILE" ]; then
+	(
+		umask 077
+		set -C
+		cat "$LEGACY_HMAC_FILE" >"$DATA_DIR/secret"
+	)
+	chown node:node "$DATA_DIR/secret"
+	chmod 600 "$DATA_DIR/secret"
+fi
+# Migrate existing volume ownership once instead of walking it on every boot.
+OWNERSHIP_MARKER="$DATA_DIR/.ownership-migrated-node-v1"
+if [ ! -f "$OWNERSHIP_MARKER" ]; then
+	chown -R node:node "$DATA_DIR"
+	printf '%s\n' 'node:node' >"$OWNERSHIP_MARKER"
+	chown node:node "$OWNERSHIP_MARKER"
+	chmod 600 "$OWNERSHIP_MARKER"
+fi
+for dir in "$HOME" "$III_COMPOSE_STATE_DIR" "$DATA_DIR/config"; do
+	mkdir -p "$dir"
+	chown node:node "$dir"
+	chmod 700 "$dir"
+done
 
-mkdir -p /opt/agentmemory/config
-chown -R "$RUN_AS" /opt/agentmemory/config
-
-cat >"$III_CONFIG" <<'EOF'
-workers:
-  - name: iii-http
-    config:
-      port: 3111
-      host: 0.0.0.0
-      default_timeout: 180000
-      cors:
-        allowed_origins: ["http://localhost:3111", "http://localhost:3113", "http://127.0.0.1:3111", "http://127.0.0.1:3113"]
-        allowed_methods: [GET, POST, PUT, DELETE, OPTIONS]
-  - name: iii-state
-    config:
-      adapter:
-        name: kv
-        config:
-          store_method: file_based
-          file_path: /data/state_store.db
-  - name: iii-queue
-    config:
-      adapter:
-        name: builtin
-  - name: iii-pubsub
-    config:
-      adapter:
-        name: local
-  - name: iii-cron
-    config:
-      adapter:
-        name: kv
-  - name: iii-stream
-    config:
-      port: 3112
-      host: 0.0.0.0
-      adapter:
-        name: kv
-        config:
-          store_method: file_based
-          file_path: /data/stream_store
-  - name: iii-observability
-    config:
-      enabled: true
-      service_name: agentmemory
-      exporter: memory
-      sampling_ratio: 0.1
-      metrics_enabled: true
-      logs_enabled: true
-      logs_console_output: false
-EOF
-chown "$RUN_AS" "$III_CONFIG"
-
-if [ ! -s "$HMAC_FILE" ]; then
-	SECRET="$(openssl rand -hex 32)"
-	umask 077
-	printf '%s\n' "$SECRET" >"$HMAC_FILE"
-	chmod 600 "$HMAC_FILE"
-	chown "$RUN_AS" "$HMAC_FILE"
-	echo "================================================================"
-	echo "agentmemory: generated HMAC secret on first boot"
-	echo "AGENTMEMORY_SECRET=$SECRET"
-	echo "Copy this value now. It will not be printed again."
-	echo "Stored at: $HMAC_FILE (chmod 600)"
-	echo "To rotate: delete $HMAC_FILE on the persistent volume and restart."
-	echo "================================================================"
+current_nofile="$(ulimit -n)"
+if [ "$current_nofile" != unlimited ] && [ "$current_nofile" -lt 10240 ]; then
+	ulimit -n 10240 2>/dev/null || ulimit -n "$(ulimit -H -n)" 2>/dev/null || true
 fi
 
-export AGENTMEMORY_SECRET="$(cat "$HMAC_FILE")"
+# Worker Compose requires an explicit environment allowlist.
+WORKER_COMPOSE_FILE="$DATA_DIR/worker-compose.runtime.yaml"
+export WORKER_COMPOSE_FILE REST_ALLOWED_ORIGINS AGENTMEMORY_STATE_BACKEND AGENTMEMORY_REDIS_URL
+if [ "${AGENTMEMORY_STATE_BACKEND:-}" = redis ] && [ -z "${AGENTMEMORY_REDIS_URL:-}" ]; then
+	echo "AGENTMEMORY_STATE_BACKEND=redis requires AGENTMEMORY_REDIS_URL" >&2
+	exit 1
+fi
+node <<'NODE'
+const fs = require("node:fs");
+const source = "/opt/agentmemory/worker-compose.yaml";
+const target = `${process.env.AGENTMEMORY_DATA_DIR}/worker-compose.runtime.yaml`;
+let input = fs.readFileSync(source, "utf8");
+const marker = '        allowed_origins: ["__REST_ALLOWED_ORIGINS__"]';
+if (!input.includes(marker)) throw new Error("Could not locate REST CORS allowlist marker");
+const origins = process.env.REST_ALLOWED_ORIGINS.split(",").map((origin) => origin.trim()).filter(Boolean);
+if (origins.length === 0 || origins.some((origin) => /[\u0000-\u001f\u007f]/.test(origin))) throw new Error("REST_ALLOWED_ORIGINS must contain comma-separated origins without control characters");
+input = input.replace(marker, `        allowed_origins:\n${origins.map((origin) => `          - ${JSON.stringify(origin)}`).join("\n")}`);
+const { parse, stringify } = require("/opt/agentmemory/node_modules/yaml");
+const configPath = `${process.env.AGENTMEMORY_DATA_DIR}/config/iii-observability.yaml`;
+let entry;
+try {
+  entry = parse(fs.readFileSync(configPath, "utf8"));
+  if (!entry || typeof entry !== "object" || Array.isArray(entry) || entry.id !== "iii-observability") {
+    throw new Error(`Unexpected persisted observability configuration at ${configPath}`);
+  }
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+  entry = { id: "iii-observability", name: "Observability", description: "", schema: {} };
+}
+const value = entry.value && typeof entry.value === "object" && !Array.isArray(entry.value) ? entry.value : {};
+if (value.sampling_ratio === undefined) value.sampling_ratio = 0.1;
+if (value.logs_console_output === undefined) value.logs_console_output = false;
+const storage = value.trace_storage && typeof value.trace_storage === "object" && !Array.isArray(value.trace_storage) ? value.trace_storage : {};
+if (typeof storage.directory !== "string" || storage.directory === "" || storage.directory === "./data/observability/traces") {
+  storage.directory = `${process.env.AGENTMEMORY_DATA_DIR}/observability/traces`;
+  value.trace_storage = storage;
+}
+entry.value = value;
+const temporary = `${configPath}.tmp`;
+fs.writeFileSync(temporary, stringify(entry), { mode: 0o600 });
+fs.renameSync(temporary, configPath);
+fs.chmodSync(configPath, 0o600);
+const observabilityDir = `${process.env.AGENTMEMORY_DATA_DIR}/observability`;
+const tracesDir = `${observabilityDir}/traces`;
+fs.mkdirSync(tracesDir, { recursive: true, mode: 0o700 });
+fs.chownSync(observabilityDir, 1000, 1000);
+fs.chmodSync(observabilityDir, 0o700);
+fs.chownSync(tracesDir, 1000, 1000);
+fs.chmodSync(tracesDir, 0o700);
+if (process.env.AGENTMEMORY_STATE_BACKEND === "redis") {
+  const compose = parse(input);
+  if (!compose.containers?.state?.config_override?.adapter) throw new Error("Could not locate state adapter config");
+  const redisUrl = process.env.AGENTMEMORY_REDIS_URL;
+  if (!redisUrl || /[\u0000-\u001f\u007f]/.test(redisUrl)) throw new Error("AGENTMEMORY_REDIS_URL is required and must not contain control characters");
+  compose.containers.state.config_override.adapter = { name: "redis", config: { redis_url: redisUrl } };
+  input = stringify(compose);
+}
+fs.writeFileSync(target, input, { mode: 0o600 });
+NODE
+chown node:node "$DATA_DIR/config/iii-observability.yaml" "$WORKER_COMPOSE_FILE"
 
-exec gosu "$RUN_AS" agentmemory "$@"
+exec gosu node:node /usr/local/bin/iii compose \
+	--namespace agentmemory --up --file "$WORKER_COMPOSE_FILE"

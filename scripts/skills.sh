@@ -52,5 +52,8 @@ npx skills add --agent opencode -g https://github.com/grafana/gcx.git -y
 npx skills add --agent opencode -g rohitg00/agentmemory -y
 npx skills add --agent opencode -g https://github.com/cloudflare/security-audit-skill  security-audit -y
 
+# Cloudflare
+npx skills add --agent opencode -g https://github.com/cloudflare/skills -y
+
 # Show the final global skill set for OpenCode.
 npx skills ls --agent opencode -g -y

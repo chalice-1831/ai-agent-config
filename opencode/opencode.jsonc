@@ -84,7 +84,7 @@
     }
   },
   "plugins": [
-    "@infituit/opencode-acp@2.0.0-alpha.3"
+    "@infituit/opencode-acp@2.0.0-alpha.4"
   ],
   "share": "disabled",
   "watcher": {

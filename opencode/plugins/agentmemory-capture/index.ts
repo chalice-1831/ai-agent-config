@@ -3,6 +3,8 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join } from "node:path";
+import { redactRecord, sliceCapture as safeSlice } from "./privacy";
+import { isLoopbackUrl, transportAllowed } from "./transport";
 
 const API = process.env.AGENTMEMORY_URL || "http://localhost:3111";
 // OpenCode reports tool names in lowercase ("read", "edit", ...); matching is
@@ -53,19 +55,6 @@ function envFileSecret(): string {
   return found;
 }
 
-function isLoopbackUrl(url: string): boolean {
-  try {
-    const host = new URL(url).hostname.replace(/^\[|\]$/g, "").toLowerCase();
-    return (
-      host === "localhost" ||
-      host === "::1" ||
-      /^127(?:\.\d{1,3}){3}$/.test(host)
-    );
-  } catch {
-    return false;
-  }
-}
-
 function resolveSecret(url: string, explicit: string | undefined): string {
   const configured = usableSecret(explicit);
   if (configured) return configured;
@@ -83,16 +72,50 @@ function authHeaders(): Record<string, string> {
   return headers;
 }
 
+let warnedTransport = false;
+function canSend(): boolean {
+  if (transportAllowed(API)) return true;
+  if (!warnedTransport) {
+    warnedTransport = true;
+    console.error("[agentmemory] Capture disabled: AGENTMEMORY_URL must use HTTPS or loopback HTTP.");
+  }
+  return false;
+}
+
+// Redact content fields without changing protocol identities or routing scope.
+function requestBody(path: string, body: Record<string, unknown>): string {
+  const { sessionId, project, cwd, hookType, timestamp, ...content } = body;
+  const safe = redactRecord(content);
+  if (path === "/session/start" && "parentID" in content) safe.parentID = content.parentID;
+  if (hookType && content.data && typeof content.data === "object") {
+    const data = content.data as Record<string, unknown>;
+    const safeData = safe.data as Record<string, unknown>;
+    for (const key of ["call_id", "tool_call_id", "permission_id", "subtask_id", "messageID", "parentID", "modelID", "providerID"]) {
+      if (key in data) safeData[key] = data[key];
+    }
+  }
+  return JSON.stringify({
+    ...safe,
+    sessionId,
+    project,
+    cwd,
+    hookType,
+    timestamp,
+  });
+}
+
 async function post(
   path: string,
   body: Record<string, unknown>,
   timeoutMs = 5000,
 ): Promise<void> {
+  if (!canSend()) return;
   try {
     await fetch(`${API}/agentmemory${path}`, {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify(body),
+      body: requestBody(path, body),
+      redirect: "error",
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (e) {
@@ -105,11 +128,13 @@ async function postJson(
   path: string,
   body: Record<string, unknown>,
 ): Promise<unknown | null> {
+  if (!canSend()) return null;
   try {
     const res = await fetch(`${API}/agentmemory${path}`, {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify(body),
+      body: requestBody(path, body),
+      redirect: "error",
       signal: AbortSignal.timeout(5000),
     });
     return res.ok ? await res.json() : null;
@@ -214,13 +239,10 @@ type MessageContext = {
   error: string | null;
 };
 const messageContexts = new Map<string, Map<string, MessageContext>>();
-const contextInjectedSessions = new Set<string>();
-// cache the context returned by POST /session/start so the chat
-// system-transform hook can inject it without a second /context fetch.
-// Auto-injection now happens at session.created (immediately) AND at
-// the first prompt_submit (fallback for older OpenCode builds that
-// don't implement experimental.chat.system.transform).
+// V2 context transforms are request-local: reuse retrieval, not injection.
+// Session-start context serves the first turn; each later prompt invalidates it.
 const startContextCache = new Map<string, string>();
+const pendingStartContexts = new Set<string>();
 
 function stashFor(sid: string): Set<string> {
   let s = stashedFiles.get(sid);
@@ -274,16 +296,6 @@ function pruneSessionMaps(sid: string): void {
   permissionRequests.delete(sid);
   messageContexts.delete(sid);
   sessionProjects.delete(sid);
-}
-
-function safeSlice(v: unknown, max: number): string {
-  if (typeof v === "string") return v.slice(0, max);
-  if (v == null) return "";
-  try {
-    return JSON.stringify(v).slice(0, max);
-  } catch {
-    return "";
-  }
 }
 
 function hasEmptyMemorySearchResult(
@@ -400,7 +412,7 @@ export const AgentmemoryCapturePlugin = Plugin.define({
       if (sid === activeSessionId) activeSessionId = null;
       pruneSessionMaps(sid);
       startContextCache.delete(sid);
-      contextInjectedSessions.delete(sid);
+      pendingStartContexts.delete(sid);
     }
 
     const eventHandler = async (event: any) => {
@@ -415,7 +427,8 @@ export const AgentmemoryCapturePlugin = Plugin.define({
         stashedFiles.set(activeSessionId, new Set());
         seenSubtaskIds.delete(activeSessionId);
         seenToolCallIds.delete(activeSessionId);
-        contextInjectedSessions.delete(activeSessionId);
+        pendingStartContexts.delete(activeSessionId);
+        startContextCache.delete(activeSessionId);
         // Snapshot the session id locally — `activeSessionId` is mutable
         // and another `session.created` event during the await could
         // rebind it, causing context to be cached against the wrong key.
@@ -451,6 +464,7 @@ export const AgentmemoryCapturePlugin = Plugin.define({
         const startCtx = (startResult as any)?.context;
         if (typeof startCtx === "string" && startCtx.length > 0) {
           startContextCache.set(sessionId, startCtx);
+          pendingStartContexts.add(sessionId);
         }
         if (pendingConfig) {
           await observe(sessionId, "config_loaded", pendingConfig);
@@ -881,7 +895,8 @@ export const AgentmemoryCapturePlugin = Plugin.define({
     // ── chat.message ──
     await ctx.session.hook("prompt", async (event: any) => {
       const sid = event.sessionID || activeSessionId;
-      if (!sid) return;
+      if (!sid || endedSessions.has(sid)) return;
+      if (!pendingStartContexts.delete(sid)) startContextCache.delete(sid);
       const prompt = event.prompt ?? {};
       const files = Array.isArray(prompt.files)
         ? prompt.files
@@ -902,8 +917,7 @@ export const AgentmemoryCapturePlugin = Plugin.define({
         agent: event.agent ?? null,
         model: event.model ?? null,
         variant: event.variant ?? null,
-        prompt:
-          typeof prompt.text === "string" ? prompt.text.slice(0, 8000) : "",
+        prompt: safeSlice(prompt.text, 8000),
         files: files.slice(0, 20),
         parts_summary: ["text", ...files.map(() => "file")],
       });
@@ -932,26 +946,22 @@ export const AgentmemoryCapturePlugin = Plugin.define({
       const sid = event.sessionID || activeSessionId;
       if (!sid || endedSessions.has(sid)) return;
 
-      if (!contextInjectedSessions.has(sid)) {
-        if (!Array.isArray(event.system)) return;
-        event.system.push({ type: "text", text: AGENTMEMORY_INSTRUCTIONS });
-        // prefer the context already fetched at session.created;
-        // fall back to a fresh /context call if the cache missed (e.g.
-        // session resumed across plugin reloads).
-        let ctx = startContextCache.get(sid);
-        if (typeof ctx !== "string" || ctx.length === 0) {
-          const result = await postJson("/context", {
-            sessionId: sid,
-            project: projectFor(sid).name,
-          });
-          ctx = (result as any)?.context;
-        } else {
-          startContextCache.delete(sid);
+      if (!Array.isArray(event.system)) return;
+      event.system.push({ type: "text", text: AGENTMEMORY_INSTRUCTIONS });
+      let memoryContext = startContextCache.get(sid);
+      if (memoryContext === undefined) {
+        const result = await postJson("/context", {
+          sessionId: sid,
+          project: projectFor(sid).name,
+        });
+        memoryContext = (result as any)?.context;
+        // Cache successful empty results too; failed requests remain retryable.
+        if (typeof memoryContext === "string" && !endedSessions.has(sid)) {
+          startContextCache.set(sid, memoryContext);
         }
-        if (typeof ctx === "string" && ctx.length > 0) {
-          event.system.push({ type: "text", text: ctx });
-        }
-        contextInjectedSessions.add(sid);
+      }
+      if (typeof memoryContext === "string" && memoryContext.length > 0) {
+        event.system.push({ type: "text", text: memoryContext });
       }
 
       const stash = stashFor(sid);
@@ -960,6 +970,7 @@ export const AgentmemoryCapturePlugin = Plugin.define({
 
       const enrichResult = await postJson("/enrich", {
         sessionId: sid,
+        project: projectFor(sid).name,
         files,
         toolName: "enrich_inject",
       });

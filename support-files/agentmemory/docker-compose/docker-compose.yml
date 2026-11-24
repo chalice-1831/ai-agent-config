@@ -4,10 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        AGENTMEMORY_VERSION: "0.9.31"
-        III_VERSION: "0.25.0"
-        STATE_VERSION: "0.22.20"
-        HTTP_VERSION: "0.22.7"
+        AGENTMEMORY_VERSION: "0.9.33"
+        III_VERSION: "0.25.1"
+        STATE_VERSION: "0.22.22"
+        HTTP_VERSION: "0.22.8"
     container_name: agentmemory
     restart: unless-stopped
     stop_grace_period: 30s
@@ -17,6 +17,7 @@ services:
       - "0.0.0.0:3111:3111"
       - "127.0.0.1:3113:3113"
     environment:
+      AGENTMEMORY_LLM_PROVIDER: ${AGENTMEMORY_LLM_PROVIDER:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_BASE_URL: ${OPENAI_BASE_URL:-http://127.0.0.1:8090/v1}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-6-sol}

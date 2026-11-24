@@ -1,20 +1,20 @@
 # syntax=docker/dockerfile:1
-ARG III_VERSION=0.25.0
+ARG III_VERSION=0.25.1
 ARG NODE_VERSION=24-bookworm-slim
 
 FROM iiidev/iii:${III_VERSION} AS iii-engine
 
 FROM node:${NODE_VERSION} AS dependencies
 WORKDIR /opt/agentmemory
-ARG AGENTMEMORY_VERSION=0.9.31
+ARG AGENTMEMORY_VERSION=0.9.33
 RUN --mount=type=cache,target=/root/.npm \
     npm install --save-exact --omit=dev --omit=optional --no-fund --no-audit \
       "@agentmemory/agentmemory@${AGENTMEMORY_VERSION}"
 
 FROM node:${NODE_VERSION}
 ARG III_VERSION
-ARG STATE_VERSION=0.22.20
-ARG HTTP_VERSION=0.22.7
+ARG STATE_VERSION=0.22.22
+ARG HTTP_VERSION=0.22.8
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates tini gosu \

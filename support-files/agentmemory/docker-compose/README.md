@@ -5,7 +5,7 @@
 ## 文件
 
 - `docker-compose.yml`: 构建并运行 `agentmemory`。
-- `Dockerfile`: 分离 npm 依赖安装与运行阶段，固定 `@agentmemory/agentmemory` 0.9.31、iii 0.25.0、state 0.22.20 和 http 0.22.7。
+- `Dockerfile`: 分离 npm 依赖安装与运行阶段，固定 `@agentmemory/agentmemory` 0.9.33、iii 0.25.1、state 0.22.22 和 http 0.22.8。
 - `entrypoint.sh`: 准备持久化存储、迁移旧凭据，并通过 iii Worker Compose 启动服务。
 - `worker-compose.yaml`: 定义 state、http 和 agentmemory worker，启动应用前探测 `state::get` 是否可用，并显式转发本 Compose stack 的环境变量。
 - `iii.worker.yaml`: agentmemory worker 的启动声明。
@@ -101,7 +101,7 @@ OPENAI_EMBEDDING_DIMENSIONS=4096
 
 这些 `OPENAI_EMBEDDING_*` 变量只在 `EMBEDDING_PROVIDER=openai` 时生效；如果改用 Voyage 这类非 OpenAI embedding provider，应改 `EMBEDDING_PROVIDER` 并填写对应 provider token。
 
-只有在 LLM-compatible provider 已配置可用后，才在 `.env` 中启用 compression、context injection 和 graph extraction。
+只有在 LLM-compatible provider 已配置可用后，才在 `.env` 中启用 compression、context injection 和 graph extraction。从 0.9.32 起，仅设置 API key 不会启用 LLM 功能；使用已有 OpenAI-compatible 接口时，还需显式设置 `AGENTMEMORY_LLM_PROVIDER=openai`。这不会更改 embedding provider、模型或维度。
 
 agentmemory 当前只通过 `RERANK_ENABLED=true` 暴露一个可选的本地 rerank 步骤。这个 Compose stack 没有外部 reranker 模型配置点，所以不要把 `Qwen3-Reranker-8B` 加到这里；除非上游 agentmemory 增加明确支持的模型或配置变量。
 

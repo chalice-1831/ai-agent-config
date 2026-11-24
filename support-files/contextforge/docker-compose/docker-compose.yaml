@@ -1,0 +1,102 @@
+name: contextforge
+
+services:
+  contextforge:
+    image: ghcr.io/ibm/mcp-context-forge:v1.1.1@sha256:16c7a8985c1a3528ba49fcab32951e06c9a41a171fc5c41d24b085283c4556a5
+    container_name: contextforge
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "4444"
+      DATABASE_URL: "sqlite:////data/mcp.db"
+      CACHE_TYPE: "database"
+      GUNICORN_WORKERS: "1"
+      MCPGATEWAY_UI_ENABLED: "true"
+      MCPGATEWAY_ADMIN_API_ENABLED: "true"
+      AUTH_REQUIRED: "true"
+      MCP_CLIENT_AUTH_ENABLED: "true"
+      # Single-user local deployment: disable tiered request throttling.
+      RATE_LIMITING_ENABLED: "false"
+      EMAIL_AUTH_ENABLED: "true"
+      PUBLIC_REGISTRATION_ENABLED: "false"
+      API_ALLOW_BASIC_AUTH: "false"
+      DOCS_ALLOW_BASIC_AUTH: "false"
+      # HTTP is limited to loopback; enable secure cookies when adding HTTPS.
+      SECURE_COOKIES: "false"
+    ports:
+      - "127.0.0.1:4444:4444"
+    volumes:
+      - contextforge_data:/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import httpx; r = httpx.get('http://127.0.0.1:4444/health', timeout=5); r.raise_for_status()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web_ui_redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - web_ui_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web_ui:
+    image: ghcr.io/contextforge-org/contextforge-web-ui:0.3.1@sha256:f223f74ffba8398e292348f633139302f68e3e6a5521ba3b0d59bde84c8cde8b
+    restart: unless-stopped
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "3001"
+      CONTEXTFORGE_URL: "http://contextforge:4444"
+      COOKIE_SECURE: "false"
+      REDIS_URL: "redis://web_ui_redis:6379/0"
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      contextforge:
+        condition: service_healthy
+      web_ui_redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  contextforge_data:
+  web_ui_redis_data:

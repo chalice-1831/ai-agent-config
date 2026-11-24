@@ -20,7 +20,8 @@
 │   ├── dcp.jsonc                # Dynamic Context Pruning 配置
 │   └── plugins/                 # 本地 OpenCode 插件
 ├── support-files/
-│   └── agentmemory/docker-compose/ # agentmemory Docker Compose 运行模板
+│   ├── agentmemory/docker-compose/ # agentmemory Docker Compose 运行模板
+│   └── contextforge/docker-compose/ # MCP 网关、Web UI 和会话存储模板
 └── scripts/
     └── skills.sh                # 全局安装常用 OpenCode skills
 ```
@@ -137,6 +138,14 @@ backup  占位命令，尚未实现
 
 OpenCode 权限审计插件仅记录弹出的权限申请及用户回复，包括原始 `pattern` 和项目根目录路径，不会自动修改权限白名单。记录按小时写入用户级 JSONL 文件，默认存放在 `~/.local/state/opencode/permission-audit/`（可通过 `XDG_STATE_HOME` 更改位置），文件权限为 `0600`。插件不会自动清理记录，旧文件需手动删除；写入失败时会记录错误，并在 TUI 可用时提示，不阻断审批。
 
+### MCP 网关与凭证托管
+
+ContextForge 作为 MCP 转发网关保管上游凭证，OpenCode 只持有权限受限的网关调用 Token。仓库提供 [ContextForge 部署与接入说明](support-files/contextforge/docker-compose/README.md)，包含 Gateway、Web UI 和 Redis 三容器模板、首次密钥生成、virtual server 配置及备份要求。
+
+ContextForge 是项目级可选能力，不加入 `opencode/opencode.jsonc` 全局配置。有敏感 MCP 需求的项目，在自己的 `opencode.jsonc` 中配置 `mcp.servers.contextforge`，连接网关中对应的 virtual server，并通过文件引用加载该项目的受限调用 Token。真实 Token、运行目录 `.env` 和上游凭证不提交仓库；具体配置见上述接入说明。
+
+原有直连 MCP 保留，不自动迁移；`opencode.sh` 只链接配置，不启动网关。默认本机监听和关闭网关限流仅面向个人自用。如果 Agent 有权读取网关配置、数据卷或操作 Docker，本机部署不能保证上游秘密对它不可见；需要硬隔离时应部署到独立权限域。
+
 ### OpenCode 宿主 Trace（OTLP）
 
 OpenCode 原生支持通过 OTLP/HTTP 导出宿主运行时的 trace。它不需要额外插件；使用已有的 OpenTelemetry Collector、Tempo 或其他兼容 OTLP/HTTP 的接收端即可。
@@ -179,7 +188,10 @@ opencode service status
 
 ## Support Files
 
-`support-files/agentmemory/docker-compose/` 维护 agentmemory Docker Compose 运行模板，可供 OpenCode、Codex 或其他 agent 共用同一个 memory server。真实 `.env` 不进入仓库，按子目录 README 从 `.env.example` 复制后填写本机配置。
+- [`support-files/agentmemory/docker-compose/`](support-files/agentmemory/docker-compose/README.md)：agentmemory 运行模板，可供 OpenCode、Codex 或其他 agent 共用同一个 memory server。
+- [`support-files/contextforge/docker-compose/`](support-files/contextforge/docker-compose/README.md)：MCP 网关及凭证托管模板，默认仅本机访问。
+
+真实 `.env` 不进入仓库。按各子目录 README 初始化；ContextForge 的密钥由初始化命令随机生成，不要使用空密钥启动。
 
 ## 常用维护流程
 

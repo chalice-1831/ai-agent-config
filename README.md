@@ -12,6 +12,8 @@
 ├── AGENTS-compression-guide.md  # AGENTS.md 压缩格式与维护指南
 ├── mise.toml                    # 基础工具链：Go、LSP、Biome、ripgrep、jq、yq、gh、ast-grep 等
 ├── mise.sh                      # 将 mise.toml 链接到 mise 全局配置的脚本
+├── herdr.toml                   # Herdr 主题、通知和界面配置
+├── herdr.sh                     # 将 herdr.toml 链接到 Herdr 配置的脚本
 ├── opencode.sh                  # 将配置链接到 OpenCode 配置目录的脚本
 ├── codex.sh                     # 安装 Codex 规则并同步共享 MCP
 ├── codex/                       # 共享 MCP、命令规则及安装说明
@@ -81,6 +83,33 @@ TARGET_DIR=/path/to/mise-config ./mise.sh link
 ```bash
 ./mise.sh diff
 ```
+
+`herdr.sh` 按 `mise.sh` 的单文件方式，把仓库根目录的 `herdr.toml` 链接到
+`~/.config/herdr/config.toml`。请在仓库根目录运行；`link` 会替换已有配置文件，
+不会自动备份，首次执行前请按需手动备份：
+
+```bash
+./herdr.sh diff
+./herdr.sh link
+./herdr.sh diff
+```
+
+`herdr.toml` 使用 Vesper 主题、终端通知、关闭声音，并配置 reviewr 切换快捷键，其余选项沿用 Herdr 默认值。
+脚本只链接 `config.toml`，不替换整个目录，也不管理日志和会话状态。
+可用 `TARGET_DIR=/path/to/herdr-config ./herdr.sh link` 更改链接目标目录；
+如果 Herdr 使用了 `XDG_CONFIG_HOME` 或 `HERDR_CONFIG_PATH`，需将目标目录设为对应配置文件的父目录
+（本脚本的目标文件名固定为 `config.toml`）。配置路径可通过 `herdr --help` 确认。
+已运行的 Herdr 可用 `herdr server reload-config` 应用配置修改。
+
+[herdr-reviewr](https://github.com/persiyanov/herdr-reviewr) 提供 diff 审查和向 Agent 发送行评论的面板，
+要求 Herdr ≥ 0.9.3。每台机器需单独安装插件，`herdr.sh link` 不负责安装：
+
+```bash
+herdr plugin install persiyanov/herdr-reviewr
+```
+
+配置生效后，按 `Ctrl+B` 再按 `f`（`prefix+f`）切换 reviewr 面板；
+如果修改了 Herdr 的 prefix，则使用对应前缀键。插件默认也会在创建或打开 worktree 工作区时自动打开面板。
 
 `opencode.sh` 默认把这些文件以文件级符号链接链接到
 `${XDG_CONFIG_HOME:-$HOME/.config}/opencode`：
@@ -206,6 +235,8 @@ mise install
 ```bash
 ./mise.sh diff
 ./mise.sh link
+./herdr.sh diff
+./herdr.sh link
 ./opencode.sh diff
 ./opencode.sh link
 ```

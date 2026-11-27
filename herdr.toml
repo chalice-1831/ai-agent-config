@@ -1,0 +1,19 @@
+onboarding = false
+
+[theme]
+name = "vesper"
+auto_switch = false
+
+[ui]
+status_indicators = "dots"
+
+[ui.toast]
+delivery = "terminal"
+
+[ui.sound]
+enabled = false
+
+[[keys.command]]
+key = "prefix+f"
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle"

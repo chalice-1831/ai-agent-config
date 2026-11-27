@@ -32,6 +32,7 @@ npx skills add --agent opencode -g https://github.com/wshobson/agents --skill py
 ## Cli Docs
 npx skills add --agent opencode -g https://github.com/cli/cli/tree/trunk --skill gh -y
 npx skills add --agent opencode -g https://github.com/microsoft/playwright-cli --skill playwright-cli -y
+npx skills add --agent opencode -g https://github.com/herdrdev/herdr --skill herdr -y
 
 # MongoDB
 
@@ -50,7 +51,7 @@ npx skills add --agent opencode -g https://github.com/kepano/obsidian-skills.git
 npx skills add --agent opencode -g https://github.com/grafana/gcx.git -y
 
 npx skills add --agent opencode -g rohitg00/agentmemory -y
-npx skills add --agent opencode -g https://github.com/cloudflare/security-audit-skill  security-audit -y
+npx skills add --agent opencode -g https://github.com/cloudflare/security-audit-skill security-audit -y
 
 # Cloudflare
 npx skills add --agent opencode -g https://github.com/cloudflare/skills -y

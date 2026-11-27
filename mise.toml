@@ -51,7 +51,7 @@ helm = "latest"
 "npm:defuddle" = "latest"
 
 
-opencode = "2.4.1"
+opencode = "2.4.2"
 "go:github.com/grafana/gcx/cmd/gcx" = "latest"
 "go:github.com/tailscale/aperture-cli/cmd/aperture" = "v0.1.0"
 
@@ -63,3 +63,4 @@ chezmoi = "latest"
 act = "0.2.89"
 "pipx:shodan" = "latest"
 "npm:cf" = "latest"
+herdr = "latest"

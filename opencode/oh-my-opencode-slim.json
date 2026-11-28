@@ -1,0 +1,35 @@
+{
+  "$schema": "https://unpkg.com/oh-my-opencode-slim@latest/oh-my-opencode-slim.schema.json",
+  "preset": "magpie",
+  "presets": {
+    "magpie": {
+      "agents": {
+        "orchestrator": {
+          "model": "magpie/qwen-token-plan/qwen4-max",
+          "variant": "high",
+          "skills": ["*"]
+        },
+        "oracle": {
+          "model": "magpie/qwen-token-plan/qwen4-max",
+          "variant": "xhigh",
+          "skills": ["simplify"]
+        },
+        "designer": {
+          "model": "magpie/qwen-token-plan/qwen4-max",
+          "variant": "high",
+          "skills": []
+        },
+        "explorer": {
+          "model": "magpie/group/deepseek-v4.1-flash-1017",
+          "variant": "high",
+          "skills": []
+        },
+        "fixer": {
+          "model": "magpie/group/deepseek-v4.1-flash-1017",
+          "variant": "high",
+          "skills": []
+        }
+      }
+    }
+  }
+}

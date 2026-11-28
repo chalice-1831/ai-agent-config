@@ -10,6 +10,10 @@
   },
   "mcp": {
     "servers": {
+      "magpie": {
+        "type": "remote",
+        "url": "http://127.0.0.1:3425/mcp/magpie/hub/opencode"
+      },
       "codegraph": {
         "type": "local",
         "disabled": false,
@@ -84,6 +88,7 @@
     }
   },
   "plugins": [
+    "oh-my-opencode-slim@latest",
     "@infituit/opencode-acp@2.0.0-alpha.15"
   ],
   "share": "disabled",
@@ -126,7 +131,7 @@
       }
     }
   },
-  "model": "openai/sol-6.1",
+  "model": "magpie/group/deepseek-v4.1-flash-1017",
   "update": "notify",
   "formatter": {
     "gofmt": {
@@ -163,6 +168,17 @@
     }
   },
   "providers": {
+    "magpie": {
+      "compatibility": {
+        "supportsPromptCacheKey": true
+      },
+      "name": "magpie",
+      "package": "aisdk:@ai-sdk/openai-compatible",
+      "settings": {
+        "apiKey": "magpie",
+        "baseURL": "http://127.0.0.1:3425/v1"
+      }
+    },
     "anthropic": {
       "name": "anthropic",
       "package": "@opencode/ai/providers/anthropic",
@@ -553,6 +569,11 @@
       "action": "provider.use",
       "resource": "*",
       "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "magpie",
+      "effect": "allow"
     },
     {
       "action": "provider.use",
